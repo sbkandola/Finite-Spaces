@@ -64,6 +64,7 @@ def Build_TenCircle():
     return TenCircle
 
 def Build_MinTorus():
+    MinCircle = Build_MinCircle()
     MinTorus = MinCircle.product(MinCircle)
     return MinTorus
 
@@ -72,10 +73,12 @@ def Build_SixTorus():
     return SixTorus
 
 def Build_TenTorus():
+    TenCircle = Build_TenCircle()
     TenTorus = TenCircle.product(TenCircle)
     return TenTorus
 
 def Build_KleinSquared():
+    Klein = Build_Klein()
     KleinSquared = Klein.product(Klein)
     return KleinSquared
 
