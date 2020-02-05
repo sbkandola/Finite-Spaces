@@ -21,8 +21,7 @@ class FiniteSpace:
                 else:
                     self.opens[str(i)] = set({str(max(i-1,0)),str(i),str(min(i+1,k-1))})
                     
-                    
-        
+    # Returns the # of points in a space                       
     def __len__(self):
          return len(self.points)
      
