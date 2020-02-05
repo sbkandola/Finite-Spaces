@@ -7,56 +7,6 @@ Created on Mon Jan 20 18:12:47 2020
 
 class FiniteSpace:
 
-    # Some built-in spaces... is there a better way to do this?
-        # I want something like "FS.S1" to be a built-in model of S1
-    S1 = dict({'a': set({'a','c','d'}),
-       'b': set({'b','c','d'}), 
-       'c': set({'c'}), 
-       'd': set({'d'})})
-    
-    # 6-point model of S1
-    S13 = dict({
-        'y0': set({'y0','x0','x1'}),
-        'y1': set({'y1','x1','x2'}),
-        'y2': set({'y2','x2','x0'}),
-        'x0': set({'x0'}),
-        'x1': set({'x1'}),
-        'x2': set({'x2'})
-    })
-    
-    # 10-point model of S1
-    S15 = dict({
-        'y0': set({'y0','x0','x1'}),
-        'y1': set({'y1','x1','x2'}),
-        'y2': set({'y2','x2','x3'}),
-        'y3': set({'y3','x3','x4'}),
-        'y4': set({'y4','x4','x0'}),
-        'x0': set({'x0'}),
-        'x1': set({'x1'}),
-        'x2': set({'x2'}),
-        'x3': set({'x3'}),
-        'x4': set({'x4'})
-    })    
-    
-    # Minimal finite model of Klein bottle
-    K = dict({
-        'a1': set({'a1', 'b1', 'b2','b3','b4','c1','c2','c3','c4'}),
-        'a2': set({'a2', 'b1', 'b2','b5','b6','c1','c2','c3','c4'}),
-        'a3': set({'a3', 'b3', 'b5','b7','b8','c1','c2','c3','c4'}),
-        'a4': set({'a4', 'b4', 'b6','b7','b8','c1','c2','c3','c4'}),
-        'b1': set({'b1','c1','c3'}),
-        'b2': set({'b2','c2','c4'}),
-        'b3': set({'b3','c3','c4'}),
-        'b4': set({'b4','c1','c2'}),
-        'b5': set({'b5','c1','c2'}),
-        'b6': set({'b6','c3','c4'}),
-        'b7': set({'b7','c1','c3'}),
-        'b8': set({'b8','c2','c4'}),
-        'c1': set({'c1'}),
-        'c2': set({'c2'}),
-        'c3': set({'c3'}),
-        'c4': set({'c4'})})
-
     
     # Pass in a number k to generate a k-point model of [0,1]
     def __init__(self, opens=dict(), k=0):
@@ -189,10 +139,11 @@ class FiniteSpace:
             puncturedUpset[p] = self.opens[p].difference(point)
         return FiniteSpace(puncturedUpset)
         
-    
+    # Determines if a space has a unique maximal element
     def hasUniqueMax(self):
         if not self.isT0:
                 return False
+        # shortcut: any 1-point space has a unique maximal element
         if len(self.opens)==1:
             return True
         for p in self.opens:
@@ -215,6 +166,7 @@ class FiniteSpace:
     def hasUniqueMin(self):
         if len(self.points)==0:
             return False
+        # populate the closures if it hasn't been done yet
         if len(self.closures)==0:
             self.getClosures()
         if len(self.points)==1:
@@ -235,12 +187,14 @@ class FiniteSpace:
             for p in self.points:
                 if self.closures[p]==self.points:
                     return p
-
+    
+    # Determines if a point in a space is beat
     def isBeat(self,point):
         test1 = self.getPuncturedDownset(point).hasUniqueMax()
         test2 = self.getPuncturedUpset(point).hasUniqueMin()
         return (test1|test2)
     
+    # Determines if a space has a beat point
     def hasBeat(self):
         for p in self.points:
             if self.isBeat(p):
@@ -251,20 +205,24 @@ class FiniteSpace:
         for p in self.points:
             if self.isBeat(p):
                 return p
-            
+    
+    # Returns an ordered pair indicating if the space has a beat point,
+    # and if so, what that beat point is        
     def hasGetBeat(self):
         for p in self.points:
             if self.isBeat(p):
                 return (True,p)
         return (False,'')
         
-            
+    # Returns a homotopy equivalent         
     def delBeat(self,point):
         newOpens = dict()
         for p in self.points.difference(set({point})):
             newOpens[p] = self.opens[p].difference(set({point}))
         return FiniteSpace(newOpens)
     
+    # Probably gets the core of a finite space
+    # by randomly removing beat points
     def getCore(self):
         core = self.copy()
         (y,p) = core.hasGetBeat()
@@ -273,6 +231,7 @@ class FiniteSpace:
             (y,p) = core.hasGetBeat()
         return core
     
+    # Determines if a space is contractible
     def isContractible(self):
         return len(self.getCore().points)==1
     
@@ -308,8 +267,9 @@ class FiniteSpace:
         maxs = self.getMaxs()
         gc = 0
         while len(maxs)>0:
-            usedMaxs = self.getOpens(maxs).buildMaxContractible().getMaxs()
-            print(maxs)
+            cover = self.getOpens(maxs).buildMaxContractible()
+            usedMaxs = cover.getMaxs()
+            print(cover.points)
             maxs.difference_update(usedMaxs)
             gc = gc + 1
         return gc
