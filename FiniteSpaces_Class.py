@@ -28,11 +28,15 @@ class FiniteSpace:
             self.points = set(inputData.keys())
             self.closures = dict()
 
+            # From opens, construct Hasse diagram, keep in self.Hasse
+
         elif type(inputData) == int:
             print('You want a finite model of the interval... ')
             k = inputData
             self.opens = {}
-            
+
+            # Construct the proper Hasse diagram, store as self.Hasse
+
             if k > 0:
                 for i in range(k):
                     if i%2==0:
@@ -42,6 +46,10 @@ class FiniteSpace:
 
         elif type(inputdata) == nx.DiGraph :
             print('You gave me the Hasse diagram.... but this code is not done yet')
+
+            # Given a nx.Digraph type, populate self.opens, self.points, self.closures
+            # Store graph as self.Hasse
+            # Add the level of the node as an attribute (later helpful for drawing)
 
         else:
             print('I did not recognize your input type. Exiting.')
