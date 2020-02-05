@@ -7,12 +7,38 @@ Created on Mon Jan 20 18:12:47 2020
 
 class FiniteSpace:
 
-        # Some built-in spaces:
+    # Some built-in spaces... is there a better way to do this?
+        # I want something like "FS.S1" to be a built-in model of S1
     S1 = dict({'a': set({'a','c','d'}),
        'b': set({'b','c','d'}), 
        'c': set({'c'}), 
        'd': set({'d'})})
     
+    # 6-point model of S1
+    S13 = dict({
+        'y0': set({'y0','x0','x1'}),
+        'y1': set({'y1','x1','x2'}),
+        'y2': set({'y2','x2','x0'}),
+        'x0': set({'x0'}),
+        'x1': set({'x1'}),
+        'x2': set({'x2'})
+    })
+    
+    # 10-point model of S1
+    S15 = dict({
+        'y0': set({'y0','x0','x1'}),
+        'y1': set({'y1','x1','x2'}),
+        'y2': set({'y2','x2','x3'}),
+        'y3': set({'y3','x3','x4'}),
+        'y4': set({'y4','x4','x0'}),
+        'x0': set({'x0'}),
+        'x1': set({'x1'}),
+        'x2': set({'x2'}),
+        'x3': set({'x3'}),
+        'x4': set({'x4'})
+    })    
+    
+    # Minimal finite model of Klein bottle
     K = dict({
         'a1': set({'a1', 'b1', 'b2','b3','b4','c1','c2','c3','c4'}),
         'a2': set({'a2', 'b1', 'b2','b5','b6','c1','c2','c3','c4'}),
@@ -30,23 +56,31 @@ class FiniteSpace:
         'c2': set({'c2'}),
         'c3': set({'c3'}),
         'c4': set({'c4'})})
+
     
-    I = dict({'a': set({'a','b'}),
-       'b': set({'b'}), 
-       'c': set({'b','c','d'}), 
-       'd': set({'d'})})
-    
-    def __init__(self, opens):
+    # Pass in a number k to generate a k-point model of [0,1]
+    def __init__(self, opens=dict(), k=0):
         self.opens = opens
         self.points = set(opens.keys())
         self.closures = dict()
         
+        if k > 0:
+            for i in range(k):
+                if i%2==0:
+                    self.opens[str(i)] = set({str(i)})
+                else:
+                    self.opens[str(i)] = set({str(max(i-1,0)),str(i),str(min(i+1,k-1))})
+                    
+                    
+        
+    def __len__(self):
+         return len(self.points)
+     
+        
     
-    # This method is BROKEN ... is it?
-        # Well... I need to deal with how "closures" is populated
-            # I added a check method at the beginning of the methods that need is
+    # Populates "self.closures"
     def getClosures(self):
-        for point in self.opens.keys():
+        for point in self.points:
             self.closures[point] = set()
             self.closures[point].add(point)
         for point in self.points:
@@ -253,7 +287,6 @@ class FiniteSpace:
     # Greedy algorithm builds the largest contratctible subset
     # # of a space that it can by randomly adding other downsets
     def buildMaxContractible(self):
-        print('I am here!!')
         maxs = self.getMaxs()
         candidate = self.getDownset(maxs.pop())
         while len(maxs)>0:
@@ -266,20 +299,21 @@ class FiniteSpace:
     # it returns the union of their downsets
     def getOpens(self,maxs):
         newSet = FiniteSpace(dict())
-        # Should I just run "union" a bunch of times?
-        for p in maxs:
-            for q in self.opens[p]:
-                if q not in newSet.opens:
-                    newSet.opens[q] = set(self.opens[q])
+        for m in maxs:
+            newSet = newSet.union(self.getDownset(m))
         return newSet
     
+    # Estimates the gcat of a space
     def gcat(self):
         maxs = self.getMaxs()
         gc = 0
         while len(maxs)>0:
-            usedMaxs = self.getOpens(maxs).buildMaxContractible.getMaxs()
+            usedMaxs = self.getOpens(maxs).buildMaxContractible().getMaxs()
+            print(maxs)
             maxs.difference_update(usedMaxs)
             gc = gc + 1
         return gc
+    
+    
             
             
