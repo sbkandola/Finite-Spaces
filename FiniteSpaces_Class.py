@@ -27,6 +27,16 @@ class FiniteSpace:
             self.opens = inputData
             self.points = set(inputData.keys())
             self.closures = dict()
+            self.Hasse = nx.DiGraph()
+            self.Hasse.add_nodes_from(self.points)
+            
+            count = 0
+            for p in self.points:
+                p_down = set(self.opens[p])
+                for q in self.opens[p]:
+                    q_up = set(k for (k,v) in self.opens.items() if q in v)
+                    if len(p_down.intersection(q_up))==2:
+                        self.Hasse.add_edge(p,q)
 
             # From opens, construct Hasse diagram, keep in self.Hasse
 
@@ -35,6 +45,7 @@ class FiniteSpace:
             k = inputData
             self.opens = {}
             self.closures = {}
+            self.Hasse = nx.DiGraph()
 
             # Construct the proper Hasse diagram, store as self.Hasse
 
@@ -45,6 +56,13 @@ class FiniteSpace:
                     else:
                         self.opens[str(i)] = set({str(max(i-1,0)),str(i),str(min(i+1,k-1))})
                 self.points = self.opens.keys()
+                
+                for p in self.points:
+                    for q in self.opens[p]:
+                        if len(self.getDownset(p).intersection(self.getUpset(q)))==2:
+                            self.Hasse.add_edge(p,q)
+                
+                
 
         elif type(inputData) == nx.DiGraph :
             print('You gave me the Hasse diagram....')
@@ -52,6 +70,7 @@ class FiniteSpace:
             self.points = set(inputData.nodes)
             self.opens = dict()
             self.closures = dict()
+            self.Hasse = inputData
             
             for p in self.points:
                 self.opens[p] = set(p)
@@ -151,34 +170,24 @@ class FiniteSpace:
     def getDownset(self,point):
         if point not in self.opens:
             print(point+' is not in space.')
-        downset = dict()
-        for p in self.opens[point]:
-            downset[p] = self.opens[p]
+        downset = dict({k:v for (k,v) in self.opens.items() if k in self.opens[point]})
         return FiniteSpace(downset)
 
     def getPuncturedDownset(self,point):
-        puncturedDownset = dict()
-        for p in self.opens[point].difference(set({point})):
-            puncturedDownset[p] = self.opens[p].difference(point)
+        puncturedDownset = dict({k:set(v) for (k,v) in self.opens.items() if k in self.opens[point]})
+        del puncturedDownset[point]
         return FiniteSpace(puncturedDownset)
 
 
     def getUpset(self,point):
-        if len(self.closures)==0:
-            self.getClosures()
-        if point not in self.opens:
-            print(point+' is not in space.')
-        upset = dict()
-        for p in self.closures[point]:
-            upset[p] = self.opens[p]
+        upset = dict({k:v for (k,v) in self.opens.items() if point in v})
         return FiniteSpace(upset)
 
     def getPuncturedUpset(self,point):
-        if len(self.closures)==0:
-            self.getClosures()
-        puncturedUpset = dict()
-        for p in self.closures[point].difference(set({point})):
-            puncturedUpset[p] = self.opens[p].difference(point)
+        puncturedUpset = dict({k:set(v) for (k,v) in self.opens.items() if point in v})
+        for p in puncturedUpset:
+            puncturedUpset[p].remove(point)
+        del puncturedUpset[point]
         return FiniteSpace(puncturedUpset)
 
     # Determines if a space has a unique maximal element
@@ -315,3 +324,6 @@ class FiniteSpace:
             maxs.difference_update(usedMaxs)
             gc = gc + 1
         return gc
+    
+    def getHeight(self,point):
+        return len(nx.dag_longest_path(nx.dfs_tree(self.Hasse,point)))-1
