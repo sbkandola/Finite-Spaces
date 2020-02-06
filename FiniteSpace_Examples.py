@@ -69,6 +69,7 @@ def Build_MinTorus():
     return MinTorus
 
 def Build_SixTorus():
+    SixCircle = Build_SixCircle()
     SixTorus = SixCircle.product(SixCircle)
     return SixTorus
 

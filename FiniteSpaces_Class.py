@@ -34,6 +34,7 @@ class FiniteSpace:
             print('You want a finite model of the interval... ')
             k = inputData
             self.opens = {}
+            self.closures = {}
 
             # Construct the proper Hasse diagram, store as self.Hasse
 
@@ -43,9 +44,19 @@ class FiniteSpace:
                         self.opens[str(i)] = set({str(i)})
                     else:
                         self.opens[str(i)] = set({str(max(i-1,0)),str(i),str(min(i+1,k-1))})
+                self.points = self.opens.keys()
 
-        elif type(inputdata) == nx.DiGraph :
-            print('You gave me the Hasse diagram.... but this code is not done yet')
+        elif type(inputData) == nx.DiGraph :
+            print('You gave me the Hasse diagram....')
+            
+            self.points = set(inputData.nodes)
+            self.opens = dict()
+            self.closures = dict()
+            
+            for p in self.points:
+                self.opens[p] = set(p)
+                for q in inputData.successors(p):
+                    self.opens[p].add(q)
 
             # Given a nx.Digraph type, populate self.opens, self.points, self.closures
             # Store graph as self.Hasse
@@ -58,8 +69,6 @@ class FiniteSpace:
     # Returns the # of points in a space
     def __len__(self):
          return len(self.points)
-
-
 
     # Populates "self.closures"
     def getClosures(self):
@@ -110,10 +119,10 @@ class FiniteSpace:
         return union
 
     def intersection(self, space2):
-        intersection = FiniteSpace(dict())
+        intersection = dict()
         for p in set(self.points).intersection(set(space2.points)):
             intersection[p] = set(self.opens[p])
-        intersection.points = set(intersection.opens.keys())
+        # intersection.points = set(intersection.opens.keys())
         return FiniteSpace(intersection)
 
     def join(self, space2):
