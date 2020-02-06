@@ -58,10 +58,11 @@ class FiniteSpace:
                 self.points = self.opens.keys()
                 
                 for p in self.points:
+                    p_down = set(self.opens[p])
                     for q in self.opens[p]:
-                        if len(self.getDownset(p).intersection(self.getUpset(q)))==2:
+                        q_up = set(k for (k,v) in self.opens.items() if q in v)
+                        if len(p_down.intersection(q_up))==2:
                             self.Hasse.add_edge(p,q)
-                
                 
 
         elif type(inputData) == nx.DiGraph :
@@ -195,52 +196,33 @@ class FiniteSpace:
 
     # Determines if a space has a unique maximal element
     def hasUniqueMax(self):
-        if not self.isT0:
-                return False
-        # shortcut: any 1-point space has a unique maximal element
-        if len(self.opens)==1:
-            return True
-        for p in self.opens:
-            if self.opens[p]==self.points:
-                return True
-        return False
+        in0 = [n for n in self.Hasse.nodes if self.Hasse.in_degree(n)==0]
+        # if not self.isT0:
+        #         return False
+        # # shortcut: any 1-point space has a unique maximal element
+        # if len(self.opens)==1:
+        #     return True
+        # for p in self.opens:
+        #     if self.opens[p]==self.points:
+        #         return True
+        return len(in0)==1
 
     # Returns the unique maximal element of a set
     def getUniqueMax(self):
-        if self.hasUniqueMax():
-            if len(self.opens)==1:
-                return self.opens
-            for p in self.opens:
-                if self.opens[p]==self.points:
-                    return p
-        print('no unique max elt')
-        return
+        in0 = [n for n in self.Hasse.nodes if self.Hasse.in_degree(n)==0]
+        if len(in0)==1:
+            return in0[0]
 
     # Determines if a space has a unique minimal element
     def hasUniqueMin(self):
-        if len(self.points)==0:
-            return False
-        # populate the closures if it hasn't been done yet
-        if len(self.closures)==0:
-            self.getClosures()
-        if len(self.points)==1:
-            return True
-        for p in self.points:
-            # If a point's closure contains the whole space
-            if self.closures[p]==self.points:
-                return True
-        return False
+        out0 = [n for n in self.Hasse.nodes if self.Hasse.out_degree(n)==0]
+        return len(out0)==1
 
     # Returns the unique minimal element of a set
     def getUniqueMin(self):
-        if len(self.points)==0:
-            return False
-        if len(self.closures)==0:
-            self.getClosures()
-        if self.hasUniqueMin():
-            for p in self.points:
-                if self.closures[p]==self.points:
-                    return p
+        out0 = [n for n in self.Hasse.nodes if self.Hasse.out_degree(n)==0]
+        if len(out0)==1:
+            return out0[0]
 
     # Determines if a point in a space is beat
     def isBeat(self,point):
@@ -366,5 +348,5 @@ class FiniteSpace:
     
     def drawHasse(self):
         pos = self.findDrawingPositions()
-        nx.draw(self.Hasse,pos, with_labels = True)
+        nx.draw(self.Hasse,pos, with_labels = True, node_color = 'purple', font_color = 'white', font_weight = 'bold')
             

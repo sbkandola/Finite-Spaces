@@ -86,3 +86,4 @@ def Build_KleinSquared():
 if __name__=='__main__':
     Klein = Build_Klein()
     print(Klein.opens)
+    Klein.drawHasse()
