@@ -148,6 +148,7 @@ class FiniteSpace:
             intersection[p] = set(self.opens[p])
         return FiniteSpace(intersection)
 
+    # Returns the non-Hausdorff join of a space
     def join(self, space2):
         if set(self.opens).isdisjoint(set(space2.opens)):
             join = self.union(space2)
@@ -172,8 +173,6 @@ class FiniteSpace:
         return True
 
     def getDownset(self,point):
-        if point not in self.opens:
-            print(point+' is not in space.')
         downset = dict({k:v for (k,v) in self.opens.items() if k in self.opens[point]})
         return FiniteSpace(downset)
 
@@ -197,14 +196,6 @@ class FiniteSpace:
     # Determines if a space has a unique maximal element
     def hasUniqueMax(self):
         in0 = [n for n in self.Hasse.nodes if self.Hasse.in_degree(n)==0]
-        # if not self.isT0:
-        #         return False
-        # # shortcut: any 1-point space has a unique maximal element
-        # if len(self.opens)==1:
-        #     return True
-        # for p in self.opens:
-        #     if self.opens[p]==self.points:
-        #         return True
         return len(in0)==1
 
     # Returns the unique maximal element of a set

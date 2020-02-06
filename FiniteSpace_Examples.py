@@ -87,3 +87,8 @@ if __name__=='__main__':
     Klein = Build_Klein()
     print(Klein.opens)
     Klein.drawHasse()
+
+    # start = time.time()
+    # print(K2.gcat())
+    # end = time.time()
+    # print(end-start)
