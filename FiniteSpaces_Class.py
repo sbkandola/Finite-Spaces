@@ -6,7 +6,7 @@ Created on Mon Jan 20 18:12:47 2020
 """
 
 import networkx as nx
-
+import numpy as np
 
 
 
@@ -121,6 +121,10 @@ class FiniteSpace:
                 for r in space2.opens[points[1]]:
                     prod[p].add(q+','+r)
         return FiniteSpace(prod)
+    
+    # Returns the dual of a space
+    def op(self):
+        return FiniteSpace(self.Hasse.reverse())
 
     # copies a finite space
     def copy(self):
@@ -141,7 +145,6 @@ class FiniteSpace:
         intersection = dict()
         for p in set(self.points).intersection(set(space2.points)):
             intersection[p] = set(self.opens[p])
-        # intersection.points = set(intersection.opens.keys())
         return FiniteSpace(intersection)
 
     def join(self, space2):
@@ -325,5 +328,43 @@ class FiniteSpace:
             gc = gc + 1
         return gc
     
+    # gets the height of a point in a Hasse diagram
     def getHeight(self,point):
         return len(nx.dag_longest_path(nx.dfs_tree(self.Hasse,point)))-1
+
+    # gets the level of every point in a space
+    def getLevels(self):
+        levelDict = dict()
+        for p in self.points:
+            levelDict[p] = self.getHeight(p)
+        return levelDict
+    
+    # create a level dictionary for graphing later
+    def setLevels(self):
+        levelDict = self.getLevels()
+        for p in self.Hasse.nodes:
+            self.Hasse.nodes[p]['level'] = levelDict[p]
+            
+    def findDrawingPositions(self):
+        pos_y_Dict = self.getLevels()
+        levelDict={i:[]for i in set(pos_y_Dict.values())}
+        for v in pos_y_Dict.keys():
+            levelDict[pos_y_Dict[v]].append(v)
+            
+        posDict = {}
+        for level in levelDict.keys():
+            verts = levelDict[level]
+            numInLevel = len(verts)
+            if numInLevel==1:
+                v = verts[0]
+                posDict[v]=(0.5, pos_y_Dict[v])
+            else:
+                for i,v in enumerate(verts):
+                    posDict[v] = np.array([i/(numInLevel-1), pos_y_Dict[v]])
+        
+        return posDict
+    
+    def drawHasse(self):
+        pos = self.findDrawingPositions()
+        nx.draw(self.Hasse,pos, with_labels = True)
+            
