@@ -1,0 +1,61 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{tikz-cd}
+
+\title{Computing the Geometric Category of Finite Topological Spaces}
+\author{Shelley Kandola}
+\date{February 2020}
+
+\begin{document}
+
+\maketitle
+
+
+Topological Complexity was first described by Michael Farber in \cite{Farber2001}.
+Informally, the Topological Complexity (TC) of a path-connected space $X$ is the minimal number of continuous motion planning rules required to navigate between any two points in $X$. Typically, $X$ represents the space of configurations of some mechanical system, such as a robot.
+More formally, consider the following commutative diagram:
+
+\begin{center}
+   \begin{tikzcd}
+X \arrow[rd,"\Delta"] \arrow[r, "c_x"] & X^{[0,1]}\arrow[d,"\pi"] \\
+& X\times X
+\end{tikzcd} 
+\end{center}
+
+
+Here, $X$ is our path-connected space of configurations.
+The map $c_x$ sends a point $x\in X$ to the constant path at $x$ in $X^{[0,1]}$.
+The diagonal map $\Delta$ sends $x$ to $(x,x)\in X \times X$, and the projection map $\pi$ is the fibrant replacement of $\Delta$.
+It takes a path $\gamma \in X^{[0,1]}$, and sends it to its start and end points $(\gamma(0),\gamma(1)) \in X \times X$.
+
+The {\bf Schwarz genus} $\mathfrak{g}(p)$ of a fibration $p:E \to B$ is the minimal number $k$ such that there exists an open covering $U_1,\hdots,U_k$ of $B$ where each set $U_i$ admits a local $p$-section (see \cite{Schwarz1958}).
+That is, each $U_i$ has an associated map $s_i$ such that $p \circ s_i \simeq 1_B$. The \textbf{topological complexity} of $X$ is given by $\mathfrak{g}(\pi)$, and it is homotopy-invariant.
+
+Unlike other topological invariants such as homology, there is no algorithm for computing the TC of a space.
+There are a few spaces whose TC has been manually determined.
+%For example, if $X = S^1$ (e.g., a security camera that can only rotate $360^\circ$), then two continuous motion planning rules are required to instruct that camera to rotate from one position $A$ into another position $B$. If $A$ and $B$ are not antipodal, i.e., $|A-B|\neq 180^\circ$ in the case of the security camera, then the rule is to follow the shortest path from $A$ to $B$. If $A$ and $B$ are antipodal, the rule is to always rotate in some fixed direction.
+%The motion planning rules for TC have been explicitly described for only a small variety of spaces. ($n$-dimensional spheres, products of spheres, and some values $\mathbb{R}P^n$).
+For the most part, TC is calculated by determining lower- and upper-bounds.
+The upper-bound of interest to us is the Lusternik-Schnirelmann category of \cite{LS34}.
+The \textbf{Lusternik-Schnirelmann category} of a space $X$, denoted ${LS}(X)$, is the minimal number $k$ such that $X$ can be covered in $k$ open sets $U_i \subseteq X$ whose inclusion maps $\iota_i: U_i \hookrightarrow X$ are nullhomotopic.
+Farber proves in \cite{Farber2001} that $TC(X) \leq LS(X\times X)$.
+An obvious upper-bound for the Lusternik-Schnirelmann category is the minimal number of contractible open sets covering a space; in \cite{Fernandez-Ternero2018}, they describe this as the \textbf{geometric category} of a space, denoted $\text{gcat}(X)$.
+
+Realistically, a programmer might not be interested in designing a robot that can be in uncountably many positions.
+This motivates the application of topological complexity to finite topological spaces.
+When finite spaces are $T_0$, they yield a partial order, $\leq$. Given two points $x$ and $y$ in a finite space $X$, we say that $x \leq y$ if the smallest open neighborhood containing $x$ is a subset of the smallest open neighborhood containing $y$. This partial order allows us to represent finite spaces as Hasse diagrams, which are directed acyclic graphs. A point in a finite space is called \textbf{maximal} if its in-degree in the Hasse diagram is 0.
+
+An adaptation of TC for finite topological spaces was described in \cite{Tanaka2018}, called Combinatorial Complexity (CC).
+In that same paper, the author proved that for a finite topological space $X$, $CC(X) = TC(X)$, and so all the traditional tools of TC can be applied.
+Tanaka showed that if $m$ is the number of maximal elements in a finite space, we have the inequality $TC(X) \leq m^2$.
+Combining this bound the the others mentioned above, we have $TC(X) \leq LS(X\times X) \leq gcat(X \times X) \leq m^2$ for any finite path-connected space $X$.
+To date, there are no known finite spaces $X$ for which $TC(X) < LS(X \times X)$.
+In particular, these categorical open sets are either contractible open sets, or disjoint unions of contractible sets.
+Because of the combinatorial nature of finite topological spaces, we are writing a Python class to detect contractible open subsets of finite spaces, in hopes of establishing a tighter upper-bound on the TC of finite spaces besides $m^2$.
+
+\bibliography{abstract}{}
+\bibliographystyle{alpha}
+
+\end{document}
