@@ -23,21 +23,13 @@ class FiniteSpace:
         '''
 
         if type(inputData) == dict:
-            print('You gave me a dictionary of the open sets...')
+            # print('You gave me a dictionary of the open sets...')
             self.opens = inputData
             self.points = set(inputData.keys())
             self.closures = dict()
             self.Hasse = nx.DiGraph()
-            self.Hasse.add_nodes_from(self.points)
+            self.getHasse()
             
-            count = 0
-            for p in self.points:
-                p_down = set(self.opens[p])
-                for q in self.opens[p]:
-                    q_up = set(k for (k,v) in self.opens.items() if q in v)
-                    if len(p_down.intersection(q_up))==2:
-                        self.Hasse.add_edge(p,q)
-
             # From opens, construct Hasse diagram, keep in self.Hasse
 
         elif type(inputData) == int:
@@ -46,6 +38,8 @@ class FiniteSpace:
             self.opens = {}
             self.closures = {}
             self.Hasse = nx.DiGraph()
+            
+            # Note: self.Hasse won't be populated unless necessary
 
             # Construct the proper Hasse diagram, store as self.Hasse
 
@@ -56,14 +50,7 @@ class FiniteSpace:
                     else:
                         self.opens[str(i)] = set({str(max(i-1,0)),str(i),str(min(i+1,k-1))})
                 self.points = self.opens.keys()
-                
-                for p in self.points:
-                    p_down = set(self.opens[p])
-                    for q in self.opens[p]:
-                        q_up = set(k for (k,v) in self.opens.items() if q in v)
-                        if len(p_down.intersection(q_up))==2:
-                            self.Hasse.add_edge(p,q)
-                
+                                
 
         elif type(inputData) == nx.DiGraph :
             print('You gave me the Hasse diagram....')
@@ -90,6 +77,18 @@ class FiniteSpace:
     def __len__(self):
          return len(self.points)
 
+    # Populates self.Hasse if the method uses it...
+     # probably a better way to do this :(
+    def getHasse(self):
+        self.Hasse.add_nodes_from(self.points)
+
+        for p in self.points:
+            p_down = set(self.opens[p])
+            for q in self.opens[p]:
+                q_up = set(k for (k,v) in self.opens.items() if q in v)
+                if len(p_down.intersection(q_up))==2:
+                    self.Hasse.add_edge(p,q)
+    
     # Populates "self.closures"
     def getClosures(self):
         for point in self.points:
@@ -125,9 +124,11 @@ class FiniteSpace:
     
     # Returns the dual of a space
     def op(self):
+        if len(self.Hasse)==0:
+            self.getHasse()
         return FiniteSpace(self.Hasse.reverse())
 
-    # copies a finite space
+    # copies a finite space IS THIS A WASTE OF TIME?
     def copy(self):
         newSet = dict()
         for p in self.opens:
@@ -136,11 +137,11 @@ class FiniteSpace:
 
     # returns the union of self with another space
     def union(self,space2):
-        union = self.copy()
+        union = dict(self.opens)
         for p in set(space2.opens).difference(set(self.opens)):
-            union.opens[p] = set(space2.opens[p])
-        union.points = set(union.opens.keys())
-        return union
+            union[p] = set(space2.opens[p])
+        # union.points = set(union.opens.keys())
+        return FiniteSpace(union)
 
     def intersection(self, space2):
         intersection = dict()
@@ -177,9 +178,7 @@ class FiniteSpace:
         return FiniteSpace(downset)
 
     def getPuncturedDownset(self,point):
-        puncturedDownset = dict({k:set(v) for (k,v) in self.opens.items() if k in self.opens[point]})
-        del puncturedDownset[point]
-        return FiniteSpace(puncturedDownset)
+        return FiniteSpace(self.Hasse.subgraph(nx.descendants(self.Hasse,point)))
 
 
     def getUpset(self,point):
@@ -195,30 +194,40 @@ class FiniteSpace:
 
     # Determines if a space has a unique maximal element
     def hasUniqueMax(self):
+        if len(self.Hasse)==0:
+            self.getHasse()
         in0 = [n for n in self.Hasse.nodes if self.Hasse.in_degree(n)==0]
         return len(in0)==1
 
     # Returns the unique maximal element of a set
     def getUniqueMax(self):
+        if len(self.Hasse)==0:
+            self.getHasse()
         in0 = [n for n in self.Hasse.nodes if self.Hasse.in_degree(n)==0]
         if len(in0)==1:
             return in0[0]
 
     # Determines if a space has a unique minimal element
     def hasUniqueMin(self):
+        if len(self.Hasse)==0:
+            self.getHasse()
         out0 = [n for n in self.Hasse.nodes if self.Hasse.out_degree(n)==0]
         return len(out0)==1
 
     # Returns the unique minimal element of a set
     def getUniqueMin(self):
+        if len(self.Hasse)==0:
+            self.getHasse()
         out0 = [n for n in self.Hasse.nodes if self.Hasse.out_degree(n)==0]
         if len(out0)==1:
             return out0[0]
 
     # Determines if a point in a space is beat
     def isBeat(self,point):
-        test1 = self.getPuncturedDownset(point).hasUniqueMax()
-        test2 = self.getPuncturedUpset(point).hasUniqueMin()
+        test1 = self.Hasse.in_degree(point)==1
+        test2 = self.Hasse.out_degree(point)==1
+        #test1 = self.getPuncturedDownset(point).hasUniqueMax()
+        #test2 = self.getPuncturedUpset(point).hasUniqueMin()
         return (test1|test2)
 
     # Determines if a space has a beat point
@@ -277,8 +286,9 @@ class FiniteSpace:
         candidate = self.getDownset(maxs.pop())
         while len(maxs)>0:
             nextSet = self.getDownset(maxs.pop())
-            if candidate.union(nextSet).isContractible():
-                candidate = candidate.union(nextSet)
+            nextNextSet = candidate.union(nextSet)
+            if nextNextSet.isContractible():
+                candidate = nextNextSet
         return candidate
 
     # Given a list of elements of a space,
@@ -303,6 +313,8 @@ class FiniteSpace:
     
     # gets the height of a point in a Hasse diagram
     def getHeight(self,point):
+        if len(self.Hasse)==0:
+            self.getHasse()
         return len(nx.dag_longest_path(nx.dfs_tree(self.Hasse,point)))-1
 
     # gets the level of every point in a space
@@ -314,6 +326,8 @@ class FiniteSpace:
     
     # create a level dictionary for graphing later
     def setLevels(self):
+        if len(self.Hasse)==0:
+            self.getHasse()
         levelDict = self.getLevels()
         for p in self.Hasse.nodes:
             self.Hasse.nodes[p]['level'] = levelDict[p]
@@ -338,6 +352,8 @@ class FiniteSpace:
         return posDict
     
     def drawHasse(self):
+        if len(self.Hasse)==0:
+            self.getHasse()
         pos = self.findDrawingPositions()
         nx.draw(self.Hasse,pos, with_labels = True, node_color = 'purple', font_color = 'white', font_weight = 'bold')
             
