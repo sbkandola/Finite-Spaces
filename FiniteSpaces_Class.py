@@ -23,7 +23,7 @@ class FiniteSpace:
         '''
 
         if type(inputData) == dict:
-            # print('You gave me a dictionary of the open sets...')
+            print('You gave me a dictionary of the open sets...')
             self.opens = inputData
             self.points = set(inputData.keys())
             self.closures = dict()
@@ -61,9 +61,10 @@ class FiniteSpace:
             self.Hasse = inputData
             
             for p in self.points:
-                self.opens[p] = set(p)
-                for q in inputData.successors(p):
+                self.opens[p] = set()
+                for q in nx.descendants(inputData,p):
                     self.opens[p].add(q)
+                self.opens[p].add(p)
 
             # Given a nx.Digraph type, populate self.opens, self.points, self.closures
             # Store graph as self.Hasse
@@ -136,15 +137,19 @@ class FiniteSpace:
         return FiniteSpace(newSet)
 
     # returns the union of self with another space
-    def union(self,space2):
+    def Union(self,space2):
         union = dict(self.opens)
         for p in set(space2.opens).difference(set(self.opens)):
             union[p] = set(space2.opens[p])
         return FiniteSpace(union)
     
-    def Union(self,space2):
-        newGraph = nx.compose(self.Hasse,space2.Hasse)
-        return FiniteSpace(newGraph)
+    # still can't figure out how to make this method work :(
+    def union(self,space2):
+        spaceUnion = nx.DiGraph()
+        spaceUnion.add_edges_from(self.Hasse.edges)
+        spaceUnion.add_edges_from(space2.Hasse.edges)
+        spaceUnion = nx.transitive_reduction(spaceUnion)
+        return FiniteSpace(spaceUnion)
 
     def intersection(self, space2):
         intersection = dict()
@@ -176,12 +181,20 @@ class FiniteSpace:
                     return False
         return True
 
-    def getDownset(self,point):
+    def getdownset(self,point):
         downset = dict({k:v for (k,v) in self.opens.items() if k in self.opens[point]})
         return FiniteSpace(downset)
+    
+    def getDownset(self,point):
+        downnodes = nx.descendants(self.Hasse,point)
+        downnodes.add(point)
+        # print(downnodes)
+        return FiniteSpace(self.Hasse.subgraph(downnodes))
 
     def getPuncturedDownset(self,point):
-        return FiniteSpace(self.Hasse.subgraph(nx.descendants(self.Hasse,point)))
+        downset = dict({k:v for (k,v) in self.opens.items() if k in self.opens[point]})
+        del downset[point]
+        return FiniteSpace(downset)
 
 
     def getUpset(self,point):
