@@ -148,7 +148,7 @@ class FiniteSpace:
         spaceUnion = nx.DiGraph()
         spaceUnion.add_edges_from(self.Hasse.edges)
         spaceUnion.add_edges_from(space2.Hasse.edges)
-        spaceUnion = nx.transitive_reduction(spaceUnion)
+        # spaceUnion = nx.transitive_reduction(spaceUnion)
         return FiniteSpace(spaceUnion)
 
     def intersection(self, space2):
@@ -181,6 +181,7 @@ class FiniteSpace:
                     return False
         return True
 
+    # I don't think we need this method anymore vvv
     def getdownset(self,point):
         downset = dict({k:v for (k,v) in self.opens.items() if k in self.opens[point]})
         return FiniteSpace(downset)
@@ -192,21 +193,26 @@ class FiniteSpace:
         return FiniteSpace(self.Hasse.subgraph(downnodes))
 
     def getPuncturedDownset(self,point):
-        downset = dict({k:v for (k,v) in self.opens.items() if k in self.opens[point]})
-        del downset[point]
-        return FiniteSpace(downset)
+        #downset = dict({k:v for (k,v) in self.opens.items() if k in self.opens[point]})
+        #del downset[point]
+        downnodes = nx.descendants(self.Hasse,point)
+        return FiniteSpace(self.Hasse.subgraph(downnodes))
 
 
     def getUpset(self,point):
-        upset = dict({k:v for (k,v) in self.opens.items() if point in v})
-        return FiniteSpace(upset)
+        upnodes = nx.ancestors(self.Hasse,point)
+        upnodes.add(point)
+        #upset = dict({k:v for (k,v) in self.opens.items() if point in v})
+        return FiniteSpace(self.Hasse.subgraph(upnodes))
 
     def getPuncturedUpset(self,point):
-        puncturedUpset = dict({k:set(v) for (k,v) in self.opens.items() if point in v})
-        for p in puncturedUpset:
-            puncturedUpset[p].remove(point)
-        del puncturedUpset[point]
-        return FiniteSpace(puncturedUpset)
+        # puncturedUpset = dict({k:set(v) for (k,v) in self.opens.items() if point in v})
+        # for p in puncturedUpset:
+        #     puncturedUpset[p].remove(point)
+        # del puncturedUpset[point]
+        upnodes = nx.ancestors(self.Hasse,point)
+        #return FiniteSpace(puncturedUpset)
+        return FiniteSpace(self.Hasse.subgraph(upnodes))
 
     # Determines if a space has a unique maximal element
     def hasUniqueMax(self):
