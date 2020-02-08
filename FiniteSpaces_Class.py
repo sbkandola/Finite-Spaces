@@ -143,9 +143,7 @@ class FiniteSpace:
         return FiniteSpace(union)
     
     def Union(self,space2):
-        newEdges = set(self.Hasse.edges).union(set(space2.Hasse.edges))
-        newGraph = nx.DiGraph()
-        newGraph.add_edges_from(newEdges)
+        newGraph = nx.compose(self.Hasse,space2.Hasse)
         return FiniteSpace(newGraph)
 
     def intersection(self, space2):
@@ -279,10 +277,6 @@ class FiniteSpace:
     # Returns a SET of the maximal elements of a SPACE
     def getMaxs(self):
         maxs = set(n for n in self.Hasse.nodes if self.Hasse.in_degree(n)==0)
-        # maxs = set()
-        # for p in self.points:
-        #     if len(self.getUpset(p).points)==1:
-        #         maxs.add(p)
         return maxs
 
     # Greedy algorithm builds the largest contratctible subset
@@ -304,6 +298,15 @@ class FiniteSpace:
         for m in maxs:
             newSet = newSet.union(self.getDownset(m))
         return newSet
+    
+    # This is the dummy method that I'm fiddling with
+    def get_Opens(self,elts):
+        print(elts)
+        newElts = set(elts)
+        for e in elts:
+            newElts = newElts.union(set(nx.descendants(self.Hasse,e)))
+        return FiniteSpace(self.Hasse.subgraph(newElts))
+            
 
     # Estimates the gcat of a space
     def gcat(self):
@@ -312,7 +315,7 @@ class FiniteSpace:
         while len(maxs)>0:
             cover = self.getOpens(maxs).buildMaxContractible()
             usedMaxs = cover.getMaxs()
-            print(cover.points)
+            # print(cover.points)
             maxs.difference_update(usedMaxs)
             gc = gc + 1
         return gc
