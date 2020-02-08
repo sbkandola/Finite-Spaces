@@ -140,8 +140,13 @@ class FiniteSpace:
         union = dict(self.opens)
         for p in set(space2.opens).difference(set(self.opens)):
             union[p] = set(space2.opens[p])
-        # union.points = set(union.opens.keys())
         return FiniteSpace(union)
+    
+    def Union(self,space2):
+        newEdges = set(self.Hasse.edges).union(set(space2.Hasse.edges))
+        newGraph = nx.DiGraph()
+        newGraph.add_edges_from(newEdges)
+        return FiniteSpace(newGraph)
 
     def intersection(self, space2):
         intersection = dict()
@@ -273,10 +278,11 @@ class FiniteSpace:
 
     # Returns a SET of the maximal elements of a SPACE
     def getMaxs(self):
-        maxs = set()
-        for p in self.points:
-            if len(self.getUpset(p).points)==1:
-                maxs.add(p)
+        maxs = set(n for n in self.Hasse.nodes if self.Hasse.in_degree(n)==0)
+        # maxs = set()
+        # for p in self.points:
+        #     if len(self.getUpset(p).points)==1:
+        #         maxs.add(p)
         return maxs
 
     # Greedy algorithm builds the largest contratctible subset
