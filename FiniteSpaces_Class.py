@@ -143,12 +143,12 @@ class FiniteSpace:
             union[p] = set(space2.opens[p])
         return FiniteSpace(union)
     
-    # still can't figure out how to make this method work :(
+    # I think this works now!
     def union(self,space2):
         spaceUnion = nx.DiGraph()
         spaceUnion.add_edges_from(self.Hasse.edges)
         spaceUnion.add_edges_from(space2.Hasse.edges)
-        # spaceUnion = nx.transitive_reduction(spaceUnion)
+        spaceUnion = nx.transitive_reduction(spaceUnion)
         return FiniteSpace(spaceUnion)
 
     def intersection(self, space2):
@@ -274,10 +274,13 @@ class FiniteSpace:
 
     # Returns a homotopy equivalent
     def delBeat(self,point):
-        newOpens = dict()
-        for p in self.points.difference(set({point})):
-            newOpens[p] = self.opens[p].difference(set({point}))
-        return FiniteSpace(newOpens)
+        #newNodes = set(self.Hasse.nodes)
+        #newNodes.remove(point)
+       newOpens = dict()
+       for p in self.points.difference(set({point})):
+           newOpens[p] = self.opens[p].difference(set({point}))
+       return FiniteSpace(newOpens)
+        #return FiniteSpace(nx.subgraph(self.Hasse,newNodes))
 
     # Probably gets the core of a finite space
     # by randomly removing beat points
