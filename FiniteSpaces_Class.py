@@ -330,15 +330,14 @@ class FiniteSpace:
 
     # Given a list of elements of a space,
     # it returns the union of their downsets
-    def getOpens(self,maxs):
+    def get_Opens(self,maxs):
         newSet = FiniteSpace(dict())
         for m in maxs:
             newSet = newSet.union(self.getDownset(m))
         return newSet
     
     # This is the dummy method that I'm fiddling with
-    def get_Opens(self,elts):
-        print(elts)
+    def getOpens(self,elts):
         newElts = set(elts)
         for e in elts:
             newElts = newElts.union(set(nx.descendants(self.Hasse,e)))
@@ -352,7 +351,6 @@ class FiniteSpace:
         while len(maxs)>0:
             cover = self.getOpens(maxs).buildMaxContractible()
             usedMaxs = cover.getMaxs()
-            # print(cover.points)
             maxs.difference_update(usedMaxs)
             gc = gc + 1
         return gc
