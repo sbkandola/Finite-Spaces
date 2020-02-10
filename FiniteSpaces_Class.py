@@ -189,12 +189,9 @@ class FiniteSpace:
     def getDownset(self,point):
         downnodes = nx.descendants(self.Hasse,point)
         downnodes.add(point)
-        # print(downnodes)
         return FiniteSpace(self.Hasse.subgraph(downnodes))
 
     def getPuncturedDownset(self,point):
-        #downset = dict({k:v for (k,v) in self.opens.items() if k in self.opens[point]})
-        #del downset[point]
         downnodes = nx.descendants(self.Hasse,point)
         return FiniteSpace(self.Hasse.subgraph(downnodes))
 
@@ -202,16 +199,10 @@ class FiniteSpace:
     def getUpset(self,point):
         upnodes = nx.ancestors(self.Hasse,point)
         upnodes.add(point)
-        #upset = dict({k:v for (k,v) in self.opens.items() if point in v})
         return FiniteSpace(self.Hasse.subgraph(upnodes))
 
     def getPuncturedUpset(self,point):
-        # puncturedUpset = dict({k:set(v) for (k,v) in self.opens.items() if point in v})
-        # for p in puncturedUpset:
-        #     puncturedUpset[p].remove(point)
-        # del puncturedUpset[point]
         upnodes = nx.ancestors(self.Hasse,point)
-        #return FiniteSpace(puncturedUpset)
         return FiniteSpace(self.Hasse.subgraph(upnodes))
 
     # Determines if a space has a unique maximal element
