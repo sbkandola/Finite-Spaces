@@ -281,6 +281,21 @@ class FiniteSpace:
            newOpens[p] = self.opens[p].difference(set({point}))
        return FiniteSpace(newOpens)
         #return FiniteSpace(nx.subgraph(self.Hasse,newNodes))
+   
+    def DelBeat(self,point):
+        newNodes = set(self.Hasse.nodes)
+        newEdges = set(self.Hasse.edges)
+        newGraph = nx.DiGraph()
+        newGraph.add_nodes_from(newNodes)
+        newGraph.add_edges_from(newEdges)
+        newGraph.remove_node(point)
+        
+        for p in nx.ancestors(self.Hasse,point):
+            for q in nx.descendants(self.Hasse,point):
+                newGraph.add_edge(p,q)
+        newGraph = nx.transitive_reduction(newGraph)
+        return FiniteSpace(newGraph)
+        
 
     # Probably gets the core of a finite space
     # by randomly removing beat points
