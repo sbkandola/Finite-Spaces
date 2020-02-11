@@ -130,11 +130,17 @@ class FiniteSpace:
         return FiniteSpace(self.Hasse.reverse())
 
     # copies a finite space IS THIS A WASTE OF TIME?
-    def copy(self):
+    def Copy(self):
         newSet = dict()
         for p in self.opens:
             newSet[p] = set(self.opens[p])
         return FiniteSpace(newSet)
+    
+    def copy(self):
+        copyGraph = nx.DiGraph()
+        copyGraph.add_nodes_from(self.Hasse.nodes)
+        copyGraph.add_edges_from(self.Hasse.edges)
+        return FiniteSpace(copyGraph)
 
     # returns the union of self with another space
     def Union(self,space2):
@@ -274,11 +280,9 @@ class FiniteSpace:
         #return FiniteSpace(nx.subgraph(self.Hasse,newNodes))
    
     def DelBeat(self,point):
-        newNodes = set(self.Hasse.nodes)
-        newEdges = set(self.Hasse.edges)
         newGraph = nx.DiGraph()
-        newGraph.add_nodes_from(newNodes)
-        newGraph.add_edges_from(newEdges)
+        newGraph.add_nodes_from(self.Hasse.nodes)
+        newGraph.add_edges_from(self.Hasse.edges)
         newGraph.remove_node(point)
         
         for p in nx.ancestors(self.Hasse,point):
@@ -291,7 +295,8 @@ class FiniteSpace:
     # Probably gets the core of a finite space
     # by randomly removing beat points
     def getCore(self):
-        core = self.copy()
+        #core = self.copy()
+        core = self
         (y,p) = core.hasGetBeat()
         while(y):
             core = core.delBeat(p)
@@ -321,11 +326,11 @@ class FiniteSpace:
 
     # Given a list of elements of a space,
     # it returns the union of their downsets
-    def get_Opens(self,maxs):
-        newSet = FiniteSpace(dict())
-        for m in maxs:
-            newSet = newSet.union(self.getDownset(m))
-        return newSet
+#    def get_Opens(self,maxs):
+#        newSet = FiniteSpace(dict())
+#        for m in maxs:
+#            newSet = newSet.union(self.getDownset(m))
+#        return newSet
     
     # This is the dummy method that I'm fiddling with
     def getOpens(self,elts):
