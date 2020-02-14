@@ -1,27 +1,37 @@
-\documentclass{article}
+\documentclass[11pt]{article}
 \usepackage[utf8]{inputenc}
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{tikz-cd}
 \usepackage[margin = 1in]{geometry}
 
+\usepackage{titlesec}
+\titleformat{\section}
+  {\normalfont\scshape}{\thesection}{1em}{}
+
+\usepackage{authblk}
+
 \title{Computing the Geometric Category of Finite Topological Spaces}
-\author{Shelley Kandola and Elizabeth Munch}
-% \date{February 2020}
+\author[1]{\textbf{Shelley Kandola}}
+\author[2,1]{Elizabeth Munch}
+\affil[1]{Dept.~of Mathematics}
+\affil[2]{Dept.~of Computational Math, Science, and Engineering}
+\affil[\phatom{}]{Michigan State University}
+
+\date{}
 
 \begin{document}
 
 \maketitle
-
-\section{Abstract}
+\vspace{-.5in} %Getting rid of the date space, too lazy to implement titling
+\section{Introduction}
 The topological complexity of a space is the minimal number of continuous motion planning rules required to move from one point in the space to another.
 Typically, the space will represent the space of configurations of some mechanical system, such as a robot.
 In this way, topological complexity is useful for determining algorithms for robot motion planning problems.
 Restricting our spaces to finite topological spaces might allow for more accurate models of real-life mechanical systems.
 In this talk, we present algorithms for computing the geometric category of topological spaces, providing an upper-bound for the topological complexity.
 
-
-\section{Introduction}
+\section{Topological Complexity}
 
 Topological Complexity was first described by Michael Farber in \cite{Farber2001}.
 Informally, the Topological Complexity (TC) of a path-connected space $X$ is the minimal number of continuous motion planning rules required to navigate between any two points in $X$. Typically, $X$ represents the space of configurations of some mechanical system, such as a robot.
@@ -61,10 +71,14 @@ Tanaka showed that if $m$ is the number of maximal elements in a finite space, w
 Combining this bound the the others mentioned above, we have $TC(X) \leq LS(X\times X) \leq gcat(X \times X) \leq m^2$ for any finite path-connected space $X$.
 To date, there are no known finite spaces $X$ for which $TC(X) < LS(X \times X)$.
 In particular, these categorical open sets are either contractible open sets, or disjoint unions of contractible sets.
-Because of the combinatorial nature of finite topological spaces, we are able to manually construct contractible all possible open subsets covering a space.
-Our main contribution to the field is the creation of an algorithm for detecting the geometric category of a finite space.
+
+
+\section{Algorithms and Results}
+Because of the combinatorial nature of finite topological spaces, we are able to manually construct all possible contractible open subsets covering a space.
+In this work, we will discuss the creation of an algorithm for determining the geometric category of a finite space.
 By computing this value, we can provide an upper-bound for the TC of finite spaces that is tighter than $m^2$.
-The algorithm works by ... [should I go into detail here?]
+This is done by combining the open set representations with graph theoretic operations on the Hasse diagram.
+In the future, we would like to investigate the complexity of this computation, and use our related open-source code to search for a space which can show that the bound $TC(X) \leq LS(X \times X)$ is not tight.
 
 
 \bibliography{abstract}{}
