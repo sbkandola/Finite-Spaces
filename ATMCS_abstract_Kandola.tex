@@ -13,6 +13,7 @@
 
 \maketitle
 
+\section{Abstract}
 The topological complexity of a space is the minimal number of continuous motion planning rules required to move from one point in the space to another.
 Typically, the space will represent the space of configurations of some mechanical system, such as a robot.
 In this way, topological complexity is useful for determining algorithms for robot motion planning problems.
@@ -20,6 +21,7 @@ Restricting our spaces to finite topological spaces might allow for more accurat
 In this talk, we present algorithms for computing the geometric category of topological spaces, providing an upper-bound for the topological complexity.
 
 
+\section{Introduction}
 
 Topological Complexity was first described by Michael Farber in \cite{Farber2001}.
 Informally, the Topological Complexity (TC) of a path-connected space $X$ is the minimal number of continuous motion planning rules required to navigate between any two points in $X$. Typically, $X$ represents the space of configurations of some mechanical system, such as a robot.
@@ -43,8 +45,6 @@ That is, each $U_i$ has an associated map $s_i$ such that $p \circ s_i \simeq 1_
 
 Unlike other topological invariants such as homology, there is no algorithm for computing the TC of a space.
 There are a few spaces whose TC has been manually determined.
-%For example, if $X = S^1$ (e.g., a security camera that can only rotate $360^\circ$), then two continuous motion planning rules are required to instruct that camera to rotate from one position $A$ into another position $B$. If $A$ and $B$ are not antipodal, i.e., $|A-B|\neq 180^\circ$ in the case of the security camera, then the rule is to follow the shortest path from $A$ to $B$. If $A$ and $B$ are antipodal, the rule is to always rotate in some fixed direction.
-%The motion planning rules for TC have been explicitly described for only a small variety of spaces. ($n$-dimensional spheres, products of spheres, and some values $\mathbb{R}P^n$).
 For the most part, TC is calculated by determining lower- and upper-bounds.
 The upper-bound of interest to us is the Lusternik-Schnirelmann category of \cite{LS34}.
 The \textbf{Lusternik-Schnirelmann category} of a space $X$, denoted ${LS}(X)$, is the minimal number $k$ such that $X$ can be covered in $k$ open sets $U_i \subseteq X$ whose inclusion maps $\iota_i: U_i \hookrightarrow X$ are nullhomotopic.
@@ -61,7 +61,11 @@ Tanaka showed that if $m$ is the number of maximal elements in a finite space, w
 Combining this bound the the others mentioned above, we have $TC(X) \leq LS(X\times X) \leq gcat(X \times X) \leq m^2$ for any finite path-connected space $X$.
 To date, there are no known finite spaces $X$ for which $TC(X) < LS(X \times X)$.
 In particular, these categorical open sets are either contractible open sets, or disjoint unions of contractible sets.
-Because of the combinatorial nature of finite topological spaces, we are writing a Python class to detect contractible open subsets of finite spaces, in hopes of establishing a tighter upper-bound on the TC of finite spaces besides $m^2$.
+Because of the combinatorial nature of finite topological spaces, we are able to manually construct contractible all possible open subsets covering a space.
+Our main contribution to the field is the creation of an algorithm for detecting the geometric category of a finite space.
+By computing this value, we can provide an upper-bound for the TC of finite spaces that is tighter than $m^2$.
+The algorithm works by ... [should I go into detail here?]
+
 
 \bibliography{abstract}{}
 \bibliographystyle{alpha}
