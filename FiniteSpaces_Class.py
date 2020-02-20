@@ -157,11 +157,15 @@ class FiniteSpace:
         spaceUnion = nx.transitive_reduction(spaceUnion)
         return FiniteSpace(spaceUnion)
 
-    def intersection(self, space2):
+    def Intersection(self, space2):
         intersection = dict()
         for p in set(self.points).intersection(set(space2.points)):
             intersection[p] = set(self.opens[p])
         return FiniteSpace(intersection)
+    
+    def intersection(self, space2):
+        intNodes = set(self.Hasse.nodes).intersection(space2.Hasse.nodes)
+        return FiniteSpace(self.Hasse.subgraph(intNodes))
 
     # Returns the non-Hausdorff join of a space
     def join(self, space2):
