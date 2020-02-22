@@ -60,11 +60,11 @@ class FiniteSpace:
             self.closures = dict()
             self.Hasse = inputData
             
-            for p in self.points:
-                self.opens[p] = set()
-                for q in nx.descendants(inputData,p):
-                    self.opens[p].add(q)
-                self.opens[p].add(p)
+            # for p in self.points:
+            #     self.opens[p] = set()
+            #     for q in nx.descendants(inputData,p):
+            #         self.opens[p].add(q)
+            #     self.opens[p].add(p)
 
             # Given a nx.Digraph type, populate self.opens, self.points, self.closures
             # Store graph as self.Hasse
@@ -192,9 +192,9 @@ class FiniteSpace:
         return True
 
     # I don't think we need this method anymore vvv
-    def getdownset(self,point):
-        downset = dict({k:v for (k,v) in self.opens.items() if k in self.opens[point]})
-        return FiniteSpace(downset)
+    # def getdownset(self,point):
+    #     downset = dict({k:v for (k,v) in self.opens.items() if k in self.opens[point]})
+    #     return FiniteSpace(downset)
     
     def getDownset(self,point):
         downnodes = nx.descendants(self.Hasse,point)
@@ -274,7 +274,7 @@ class FiniteSpace:
         return (False,'')
 
     # Returns a homotopy equivalent
-    def delBeat(self,point):
+    def DelBeat(self,point):
         #newNodes = set(self.Hasse.nodes)
         #newNodes.remove(point)
        newOpens = dict()
@@ -283,7 +283,7 @@ class FiniteSpace:
        return FiniteSpace(newOpens)
         #return FiniteSpace(nx.subgraph(self.Hasse,newNodes))
    
-    def DelBeat(self,point):
+    def delBeat(self,point):
         newGraph = nx.DiGraph()
         newGraph.add_nodes_from(self.Hasse.nodes)
         newGraph.add_edges_from(self.Hasse.edges)
