@@ -310,7 +310,12 @@ class FiniteSpace:
     # Determines if a space is contractible
     def isContractible(self):
         return len(self.getCore().points)==1
-
+    
+    def twoDownContractible(self, max1, max2):
+        space1 = self.getDownset(max1)
+        space2 = self.getDownset(max2)
+        return space1.intersection(space2).isContractible()
+    
     # Returns a SET of the maximal elements of a SPACE
     def getMaxs(self):
         maxs = set(n for n in self.Hasse.nodes if self.Hasse.in_degree(n)==0)
@@ -322,21 +327,24 @@ class FiniteSpace:
         maxs = self.getMaxs()
         candidate = self.getDownset(maxs.pop())
         while len(maxs)>0:
+            # nextMax = maxs.pop()
             nextSet = self.getDownset(maxs.pop())
+            # tempUnion = candidate.getMaxs()
+            # tempUnion.add(nextMax)
+            # testInt = candidate.intersection(nextSet)
             nextNextSet = candidate.union(nextSet)
+            # if self.maxsAreContractible(tempUnion):
             if nextNextSet.isContractible():
-                candidate = nextNextSet
+                candidate = candidate.union(nextNextSet)
         return candidate
-
-    # Given a list of elements of a space,
-    # it returns the union of their downsets
-#    def get_Opens(self,maxs):
-#        newSet = FiniteSpace(dict())
-#        for m in maxs:
-#            newSet = newSet.union(self.getDownset(m))
-#        return newSet
     
-    # This is the dummy method that I'm fiddling with
+    def buildMaxCat(self):
+        maxCover = []
+        maxs = self.getMaxs()
+        maxCover.append(maxs.pop())
+        
+
+    # returns the union of downsets of a list of elements
     def getOpens(self,elts):
         newElts = set(elts)
         for e in elts:
