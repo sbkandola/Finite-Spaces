@@ -166,6 +166,9 @@ class FiniteSpace:
     def intersection(self, space2):
         intNodes = set(self.Hasse.nodes).intersection(space2.Hasse.nodes)
         return FiniteSpace(self.Hasse.subgraph(intNodes))
+    
+    def hasEmptyIntersection(self,space2):
+        return len(self.intersection(space2))==0
 
     # Returns the non-Hausdorff join of a space
     def join(self, space2):
@@ -309,7 +312,13 @@ class FiniteSpace:
 
     # Determines if a space is contractible
     def isContractible(self):
-        return len(self.getCore().points)==1
+        # maxs = self.getMaxs()
+        # if len(maxs)==2:
+        #     m1 = maxs.pop()
+        #     m2 = maxs.pop()
+        #     return self.twoDownContractible(m1,m2)
+        # else:
+            return len(self.getCore().points)==1
     
     def twoDownContractible(self, max1, max2):
         space1 = self.getDownset(max1)
@@ -327,13 +336,8 @@ class FiniteSpace:
         maxs = self.getMaxs()
         candidate = self.getDownset(maxs.pop())
         while len(maxs)>0:
-            # nextMax = maxs.pop()
             nextSet = self.getDownset(maxs.pop())
-            # tempUnion = candidate.getMaxs()
-            # tempUnion.add(nextMax)
-            # testInt = candidate.intersection(nextSet)
             nextNextSet = candidate.union(nextSet)
-            # if self.maxsAreContractible(tempUnion):
             if nextNextSet.isContractible():
                 candidate = candidate.union(nextNextSet)
         return candidate
@@ -341,31 +345,29 @@ class FiniteSpace:
     def buildMaxCat(self):
         maxCover = []
         maxs = self.getMaxs()
-        maxCover.append(maxs.pop())
-        while len(maxs)>0:
-            nextMax = maxs.pop()
-            for cover in maxCover:
-                if len(cover)==1:
-                    if self.twoDownContractible(cover, nextMax):
-                        cover.append(nextMax)
-                    else:
-                        maxCover.append(set({nextMax}))
-                elif len(cover)>1:
-                    print(cover)
-                    currentCover = self.getOpens(cover)
-                    nextOpen = self.getDownset(nextMax)
-                    testUnion = currentCover.union(nextOpen)
-                    if testUnion.isContractible():
-                        cover.add({nextMax})
-                    else:
-                        maxCover.append(set({nextMax}))
+        maxCover.append(self.getDownset(maxs.pop()))
+        print("Starting cover is "+str(maxCover[0].getMaxs()))
+        for m in maxs:
+            nextMax = self.getDownset(m)
+            print("Next max elt to check is "+str(nextMax.getMaxs()))
+            for c in range(len(maxCover)):
+               print("and I'm comparing it with "+str(maxCover[c].getMaxs()))
+               testUnion = maxCover[c].union(nextMax)
+               if (testUnion.isContractible()) or (nextMax.hasEmptyIntersection(maxCover[c])):
+                   print("I found something contractible or having an empty intersection, which is:")
+                   maxCover[c] = testUnion
+                   print(maxCover[c].getMaxs())
+                   break
+            maxCover.append(nextMax)
         return maxCover
+    """  One of the big issues going on here ^^^ is that it's also
+    throwing away unions whose downsets have an EMPTY intersection,
+    even if that could later be filled in to be contractible"""
                     
         
 
     # returns the union of downsets of a list of elements
     def getOpens(self,elts):
-        print(elts)
         newElts = set(elts)
         #newElts = set()
         for e in elts:
