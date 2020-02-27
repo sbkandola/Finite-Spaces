@@ -53,7 +53,7 @@ class FiniteSpace:
                                 
 
         elif type(inputData) == nx.DiGraph :
-            print('You gave me the Hasse diagram....')
+            #print('You gave me the Hasse diagram....')
             
             self.points = set(inputData.nodes)
             self.opens = dict()
@@ -342,12 +342,35 @@ class FiniteSpace:
         maxCover = []
         maxs = self.getMaxs()
         maxCover.append(maxs.pop())
+        while len(maxs)>0:
+            nextMax = maxs.pop()
+            for cover in maxCover:
+                if len(cover)==1:
+                    if self.twoDownContractible(cover, nextMax):
+                        cover.append(nextMax)
+                    else:
+                        maxCover.append(set({nextMax}))
+                elif len(cover)>1:
+                    print(cover)
+                    currentCover = self.getOpens(cover)
+                    nextOpen = self.getDownset(nextMax)
+                    testUnion = currentCover.union(nextOpen)
+                    if testUnion.isContractible():
+                        cover.add({nextMax})
+                    else:
+                        maxCover.append(set({nextMax}))
+        return maxCover
+                    
         
 
     # returns the union of downsets of a list of elements
     def getOpens(self,elts):
+        print(elts)
         newElts = set(elts)
+        #newElts = set()
         for e in elts:
+            #newElts.add(e)
+            #newElts.add(set({nx.descendants(self.Hasse,e)}))
             newElts = newElts.union(set(nx.descendants(self.Hasse,e)))
         return FiniteSpace(self.Hasse.subgraph(newElts))
             
