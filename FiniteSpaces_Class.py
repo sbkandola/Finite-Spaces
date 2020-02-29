@@ -252,8 +252,6 @@ class FiniteSpace:
     def isBeat(self,point):
         test1 = self.Hasse.in_degree(point)==1
         test2 = self.Hasse.out_degree(point)==1
-        #test1 = self.getPuncturedDownset(point).hasUniqueMax()
-        #test2 = self.getPuncturedUpset(point).hasUniqueMin()
         return (test1|test2)
 
     # Determines if a space has a beat point
@@ -287,14 +285,17 @@ class FiniteSpace:
         #return FiniteSpace(nx.subgraph(self.Hasse,newNodes))
    
     def delBeat(self,point):
+        # copy the old Hasse diagram, then delete the old point
         newGraph = nx.DiGraph()
         newGraph.add_nodes_from(self.Hasse.nodes)
         newGraph.add_edges_from(self.Hasse.edges)
         newGraph.remove_node(point)
         
+        # Restore the edges that were deleted
         for p in nx.ancestors(self.Hasse,point):
             for q in nx.descendants(self.Hasse,point):
                 newGraph.add_edge(p,q)
+        # Remove any redundant edges
         newGraph = nx.transitive_reduction(newGraph)
         return FiniteSpace(newGraph)
         
@@ -312,14 +313,13 @@ class FiniteSpace:
 
     # Determines if a space is contractible
     def isContractible(self):
-        # maxs = self.getMaxs()
-        # if len(maxs)==2:
-        #     m1 = maxs.pop()
-        #     m2 = maxs.pop()
-        #     return self.twoDownContractible(m1,m2)
-        # else:
+        maxs = list(self.getMaxs())
+        if len(maxs)==2:
+            return self.twoDownContractible(maxs[0],maxs[1])
+        else:
             return len(self.getCore().points)==1
     
+    # Determines if the union of two downsets is contractible
     def twoDownContractible(self, max1, max2):
         space1 = self.getDownset(max1)
         space2 = self.getDownset(max2)
@@ -345,24 +345,19 @@ class FiniteSpace:
     def buildMaxCat(self):
         maxCover = []
         maxs = self.getMaxs()
-        maxCover.append(self.getDownset(maxs.pop()))
-        print("Starting cover is "+str(maxCover[0].getMaxs()))
+        #maxCover.append(self.getDownset(maxs.pop()))
         for m in maxs:
+            found = False
             nextMax = self.getDownset(m)
-            print("Next max elt to check is "+str(nextMax.getMaxs()))
             for c in range(len(maxCover)):
-               print("and I'm comparing it with "+str(maxCover[c].getMaxs()))
                testUnion = maxCover[c].union(nextMax)
                if (testUnion.isContractible()) or (nextMax.hasEmptyIntersection(maxCover[c])):
-                   print("I found something contractible or having an empty intersection, which is:")
                    maxCover[c] = testUnion
-                   print(maxCover[c].getMaxs())
+                   found = True
                    break
-            maxCover.append(nextMax)
+            if found==False:
+                maxCover.append(nextMax)
         return maxCover
-    """  One of the big issues going on here ^^^ is that it's also
-    throwing away unions whose downsets have an EMPTY intersection,
-    even if that could later be filled in to be contractible"""
                     
         
 
