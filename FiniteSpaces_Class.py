@@ -361,7 +361,7 @@ class FiniteSpace:
             nextMax = self.getDownset(m)
             for c in range(len(maxCover)):
                testUnion = maxCover[c].union(nextMax)
-               if (testUnion.isContractible()) or (nextMax.hasEmptyIntersection(maxCover[c])):
+               if (testUnion.isContractibleComponents()) or (nextMax.hasEmptyIntersection(maxCover[c])):
                    maxCover[c] = testUnion
                    found = True
                    break
