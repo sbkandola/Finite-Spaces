@@ -275,14 +275,14 @@ class FiniteSpace:
         return (False,'')
 
     # Returns a homotopy equivalent
-    def DelBeat(self,point):
-        #newNodes = set(self.Hasse.nodes)
-        #newNodes.remove(point)
-       newOpens = dict()
-       for p in self.points.difference(set({point})):
-           newOpens[p] = self.opens[p].difference(set({point}))
-       return FiniteSpace(newOpens)
-        #return FiniteSpace(nx.subgraph(self.Hasse,newNodes))
+#    def DelBeat(self,point):
+#        #newNodes = set(self.Hasse.nodes)
+#        #newNodes.remove(point)
+#       newOpens = dict()
+#       for p in self.points.difference(set({point})):
+#           newOpens[p] = self.opens[p].difference(set({point}))
+#       return FiniteSpace(newOpens)
+#        #return FiniteSpace(nx.subgraph(self.Hasse,newNodes))
 
     def delBeat(self,point):
         # copy the old Hasse diagram, then delete the old point
@@ -318,6 +318,14 @@ class FiniteSpace:
             return self.twoDownContractible(maxs[0],maxs[1])
         else:
             return len(self.getCore().points)==1
+
+    # Determines if each component of a space is contractible
+    def isContractibleComponents(self):
+        comps = nx.strongly_connected_component_subgraphs(self.Hasse)
+        for comp in comps:
+            if not FiniteSpace(comp).isContractible():
+                return False
+        return True
 
     # Determines if the union of two downsets is contractible
     def twoDownContractible(self, max1, max2):
