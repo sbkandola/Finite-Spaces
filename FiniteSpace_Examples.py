@@ -8,6 +8,7 @@ Created on Wed Feb  5 10:33:45 2020
 # Testing Finite Spaces
 
 import FiniteSpaces_Class as FS
+import networkx as nx
 
 def Build_Klein():
     Klein = FS.FiniteSpace(dict({
@@ -82,6 +83,13 @@ def Build_KleinSquared():
     Klein = Build_Klein()
     KleinSquared = Klein.product(Klein)
     return KleinSquared
+
+def Build_Disjoint():
+    disjointHasse = nx.DiGraph()
+    disjointHasse.add_nodes_from('abcd')
+    disjointHasse.add_edge('a','b')
+    disjointHasse.add_edge('c','d')
+    return FS.FiniteSpace(disjointHasse)
 
 if __name__=='__main__':
     Klein = Build_Klein()
