@@ -1,5 +1,5 @@
 # Modeling Finite Spaces
-The purpose of this repository is to create a program for modeling finite topological spaces. It requires the package NetworkX.
+The purpose of this repository is to create a program for modeling finite topological spaces. It requires the packages NetworkX and numpy.
 
 ## Description of each file:
 
