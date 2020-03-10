@@ -129,25 +129,12 @@ class FiniteSpace:
             self.getHasse()
         return FiniteSpace(self.Hasse.reverse())
 
-    # copies a finite space IS THIS A WASTE OF TIME?
-    def Copy(self):
-        newSet = dict()
-        for p in self.opens:
-            newSet[p] = set(self.opens[p])
-        return FiniteSpace(newSet)
 
     def copy(self):
         copyGraph = nx.DiGraph()
         copyGraph.add_nodes_from(self.Hasse.nodes)
         copyGraph.add_edges_from(self.Hasse.edges)
         return FiniteSpace(copyGraph)
-
-    # returns the union of self with another space
-    def Union(self,space2):
-        union = dict(self.opens)
-        for p in set(space2.opens).difference(set(self.opens)):
-            union[p] = set(space2.opens[p])
-        return FiniteSpace(union)
 
     # I think this works now!
     def union(self,space2):
@@ -157,11 +144,6 @@ class FiniteSpace:
         spaceUnion = nx.transitive_reduction(spaceUnion)
         return FiniteSpace(spaceUnion)
 
-    def Intersection(self, space2):
-        intersection = dict()
-        for p in set(self.points).intersection(set(space2.points)):
-            intersection[p] = set(self.opens[p])
-        return FiniteSpace(intersection)
 
     def intersection(self, space2):
         intNodes = set(self.Hasse.nodes).intersection(space2.Hasse.nodes)
@@ -193,11 +175,6 @@ class FiniteSpace:
                 if (self.opens[p]==self.opens[q])&(p!=q):
                     return False
         return True
-
-    # I don't think we need this method anymore vvv
-    # def getdownset(self,point):
-    #     downset = dict({k:v for (k,v) in self.opens.items() if k in self.opens[point]})
-    #     return FiniteSpace(downset)
 
     def getDownset(self,point):
         downnodes = nx.descendants(self.Hasse,point)
@@ -274,15 +251,6 @@ class FiniteSpace:
                 return (True,p)
         return (False,'')
 
-    # Returns a homotopy equivalent
-#    def DelBeat(self,point):
-#        #newNodes = set(self.Hasse.nodes)
-#        #newNodes.remove(point)
-#       newOpens = dict()
-#       for p in self.points.difference(set({point})):
-#           newOpens[p] = self.opens[p].difference(set({point}))
-#       return FiniteSpace(newOpens)
-#        #return FiniteSpace(nx.subgraph(self.Hasse,newNodes))
 
     def delBeat(self,point):
         # copy the old Hasse diagram, then delete the old point
@@ -321,7 +289,7 @@ class FiniteSpace:
 
     # Determines if each component of a space is contractible
     def isContractibleComponents(self):
-        comps = nx.strongly_connected_component_subgraphs(self.Hasse)
+        comps = nx.connected_component_subgraphs(self.Hasse)
         for comp in comps:
             if not FiniteSpace(comp).isContractible():
                 return False
