@@ -289,9 +289,9 @@ class FiniteSpace:
 
     # Determines if each component of a space is contractible
     def isContractibleComponents(self):
-        comps = nx.connected_component_subgraphs(self.Hasse)
+        comps = nx.weakly_connected_components(self.Hasse)
         for comp in comps:
-            if not FiniteSpace(comp).isContractible():
+            if not FiniteSpace(self.Hasse.subgraph(comp)).isContractible():
                 return False
         return True
 
