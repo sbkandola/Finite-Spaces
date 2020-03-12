@@ -7,6 +7,7 @@ Created on Mon Jan 20 18:12:47 2020
 
 import networkx as nx
 import numpy as np
+import operator
 
 
 
@@ -321,10 +322,15 @@ class FiniteSpace:
     def buildMaxCat(self):
         maxCover = []
         maxs = self.getMaxs()
-        #maxCover.append(self.getDownset(maxs.pop()))
-        for m in maxs:
-            print('working on m =',m)
-            print('Current cover list is ', [ cover.getMaxs() for cover in maxCover])
+        m = maxs.pop()
+        maxCover.append(self.getDownset(m))
+        unHasse = self.Hasse.to_undirected()
+        unHasse_dict = nx.shortest_path_length(unHasse, m)
+        sorted_dict = sorted(unHasse_dict.items(), key=operator.itemgetter(1))
+        sorted_maxs = [key[0] for key in sorted_dict if key[0] in maxs]
+        for m in sorted_maxs:
+            #print('working on m =',m)
+            #print('Current cover list is ', [ cover.getMaxs() for cover in maxCover])
             found = False
             nextMax = self.getDownset(m)
             for c in range(len(maxCover)):
@@ -335,7 +341,7 @@ class FiniteSpace:
                    break
             if found==False:
                 maxCover.append(nextMax)
-            print('Current cover list is ', [ cover.getMaxs() for cover in maxCover])
+            #print('Current cover list is ', [ cover.getMaxs() for cover in maxCover])
         return maxCover
 
 
