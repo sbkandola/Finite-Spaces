@@ -61,16 +61,6 @@ class FiniteSpace:
             self.closures = dict()
             self.Hasse = inputData
 
-            # for p in self.points:
-            #     self.opens[p] = set()
-            #     for q in nx.descendants(inputData,p):
-            #         self.opens[p].add(q)
-            #     self.opens[p].add(p)
-
-            # Given a nx.Digraph type, populate self.opens, self.points, self.closures
-            # Store graph as self.Hasse
-            # Add the level of the node as an attribute (later helpful for drawing)
-
         else:
             print('I did not recognize your input type. Exiting.')
 
@@ -80,8 +70,9 @@ class FiniteSpace:
          return len(self.points)
 
     # Populates self.Hasse if the method uses it...
-     # probably a better way to do this :(
+    # probably a better way to do this :(
     def getHasse(self):
+        print("Getting Hasse of "+str(self.points))
         self.Hasse.add_nodes_from(self.points)
 
         for p in self.points:
@@ -161,7 +152,10 @@ class FiniteSpace:
                 for p in self.opens:
                     join.opens[q].add(p)
         return join
-
+    
+    #def quotient(self, subspace):
+        # TODO 
+        
     def isOpen(self):
         for p in self.opens:
             for q in self.opens[p]:
@@ -282,6 +276,7 @@ class FiniteSpace:
 
     # Determines if a space is contractible
     def isContractible(self):
+        print("Checking contractiblity of "+str(self.points))
         maxs = list(self.getMaxs())
         if len(maxs)==2:
             return self.twoDownContractible(maxs[0],maxs[1])
@@ -300,10 +295,16 @@ class FiniteSpace:
     def twoDownContractible(self, max1, max2):
         space1 = self.getDownset(max1)
         space2 = self.getDownset(max2)
-        return space1.intersection(space2).isContractible()
+        S1intS2 = space1.intersection(space2)
+        if len(S1intS2)==0:
+            return False
+        else:
+            return space1.intersection(space2).isContractible()
 
     # Returns a SET of the maximal elements of a SPACE
     def getMaxs(self):
+        if not self.Hasse:
+            self.getHasse()
         maxs = set(n for n in self.Hasse.nodes if self.Hasse.in_degree(n)==0)
         return maxs
 
