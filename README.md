@@ -20,5 +20,17 @@ K.drawHasse()
 K.gcat()
 ```
 
+### Brute_gcat.py
+This file is for brute-force determining the geometric category of a finite topological space. It is used to check the accuracy of the gcat method from FiniteSpaces_Class. It is a very slow algorithm that runs in factorial time.
+
+#### Brute_gcat Example:
+This will output the minimal number of contractible open sets required to cover the minimal finite model of a torus. This number is exact and not an estimate, unline the gcat method of FiniteSpaces_Class.
+```
+import FiniteSpace_Examples as FE
+import Brute_gcat as B
+T = FE.Build_MinTorus()
+B.get_brute_gcat(T)
+```
+
 ### FiniteFunctions_Class.py
 This file is very much in progress. It will be used to model continuous functions between finite topological spaces.
