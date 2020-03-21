@@ -25,9 +25,7 @@ def partition(maxs):
         yield [ [ first ] ] + smaller
         
 def is_gcat_cover(space, part):
-    print("Checking part= "+str(part))
     for p in part:
-        print("Checking p= "+str(p))
         if not(space.getOpens(set(p)).isContractible()):
             return False
     return True
@@ -36,7 +34,7 @@ def get_brute_gcat(space):
     maxs = space.getMaxs()
     gc = len(maxs)
     for part in partition(list(maxs)):
-        if (is_gcat_cover(space,part) and len(part)<gc):
+        if (len(part)<gc and is_gcat_cover(space,part)):
             gc = len(part)
     return gc
     
@@ -46,6 +44,8 @@ if __name__=='__main__':
     
     K = FE.Build_Klein()
     S = FE.Build_MinCircle()
+    
+    print("This happened")
     
     for part in partition(list(S.getMaxs())):
         print(is_gcat_cover(S,part))

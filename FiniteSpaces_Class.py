@@ -276,7 +276,7 @@ class FiniteSpace:
 
     # Determines if a space is contractible
     def isContractible(self):
-        print("Checking contractiblity of "+str(self.points))
+        # print("Checking contractiblity of "+str(self.points))
         maxs = list(self.getMaxs())
         if len(maxs)==2:
             return self.twoDownContractible(maxs[0],maxs[1])
