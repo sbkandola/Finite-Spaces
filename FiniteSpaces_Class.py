@@ -321,6 +321,15 @@ class FiniteSpace:
         return candidate
 
     def buildMaxCat(self):
+        '''
+        
+
+        Returns
+        -------
+        maxCover : TYPE
+            DESCRIPTION.
+
+        '''
         maxCover = []
         maxs = self.getMaxs()
         m = maxs.pop()

@@ -11,7 +11,21 @@ import FiniteSpaces_Class as FS
 import FiniteSpace_Examples as FE
 import networkx as nx
 
+
 def partition(maxs):
+    '''
+
+    Parameters
+    ----------
+    maxs : TYPE
+        DESCRIPTION.
+
+    Yields
+    ------
+    TYPE
+        DESCRIPTION.
+
+    '''
     if len(maxs) == 1:
         yield [maxs]
         return
