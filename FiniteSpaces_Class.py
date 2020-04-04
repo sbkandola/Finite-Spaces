@@ -24,7 +24,6 @@ class FiniteSpace:
         '''
 
         if type(inputData) == dict:
-            print('You gave me a dictionary of the open sets...')
             self.opens = inputData
             self.points = set(inputData.keys())
             self.closures = dict()
@@ -34,7 +33,6 @@ class FiniteSpace:
             # From opens, construct Hasse diagram, keep in self.Hasse
 
         elif type(inputData) == int:
-            print('You want a finite model of the interval... ')
             k = inputData
             self.opens = {}
             self.closures = {}
@@ -54,7 +52,6 @@ class FiniteSpace:
 
 
         elif type(inputData) == nx.DiGraph :
-            #print('You gave me the Hasse diagram....')
 
             self.points = set(inputData.nodes)
             self.opens = dict()
@@ -65,13 +62,22 @@ class FiniteSpace:
             print('I did not recognize your input type. Exiting.')
 
 
-    # Returns the # of points in a space
     def __len__(self):
-         return len(self.points)
+        '''
+        Returns
+        -------
+        The number of points in the space.
 
-    # Populates self.Hasse if the method uses it...
-    # probably a better way to do this :(
+        '''
+        return len(self.points)
+
     def getHasse(self):
+        '''
+        Returns
+        -------
+        None. Populates self.Hasse with the Hasse diagram of the space.
+
+        '''
         print("Getting Hasse of "+str(self.points))
         self.Hasse.add_nodes_from(self.points)
 
@@ -82,28 +88,61 @@ class FiniteSpace:
                 if len(p_down.intersection(q_up))==2:
                     self.Hasse.add_edge(p,q)
 
-    # Populates "self.closures"
     def getClosures(self):
+        '''
+        Returns
+        -------
+        None. Populates the dict self.closures where the keys are points p,
+            and the values are all the points q >= p
+
+        '''
         for point in self.points:
             self.closures[point] = set()
             self.closures[point].add(point)
         for point in self.points:
             for other in set(self.points).difference(self.opens[point]):
-                # if point <= other:
                 if point in self.opens[other]:
-                    # add other to the closure of point
                     self.closures[point].add(other)
 
-    # returns if p1 >= p2
     def isgeq(self,p1,p2):
+        '''
+        Parameters
+        ----------
+        p1 : a point of the space.
+        p2 : another point of the space.
+
+        Returns
+        -------
+        True if p1 >= p2.
+
+        '''
         return self.opens[p1].issuperset(self.opens[p2])
 
-    # returns if p1 <= p2
     def isleq(self,p1,p2):
+        '''
+        Parameters
+        ----------
+        p1 : a point of the space.
+        p2 : another point of the space.
+
+        Returns
+        -------
+        True if p1 <= p2.
+
+        '''
         return self.opens[p1].issubset(self.opens[p2])
 
-    # Returns the product of self with another space
     def product(self, space2):
+        '''
+        Parameters
+        ----------
+        space2 : an instance of FiniteSpaces_Class.
+
+        Returns
+        -------
+        A new finite space that is the product of self with space2.
+
+        '''
         prod = dict()
         for p in self.opens:
             for q in space2.opens:
@@ -115,21 +154,42 @@ class FiniteSpace:
                     prod[p].add(q+','+r)
         return FiniteSpace(prod)
 
-    # Returns the dual of a space
     def op(self):
+        '''
+        Returns
+        -------
+        The dual space of self as a Finite Space
+
+        '''
         if len(self.Hasse)==0:
             self.getHasse()
         return FiniteSpace(self.Hasse.reverse())
 
 
     def copy(self):
+        '''
+        Returns
+        -------
+        A new copy of self as a finite space.
+
+        '''
         copyGraph = nx.DiGraph()
         copyGraph.add_nodes_from(self.Hasse.nodes)
         copyGraph.add_edges_from(self.Hasse.edges)
         return FiniteSpace(copyGraph)
 
-    # I think this works now!
     def union(self,space2):
+        '''
+        Parameters
+        ----------
+        space2 : a finite space whose points are disjoint from self.
+            It will cause trouble in the long run if there are duplicate points!
+
+        Returns
+        -------
+        A new FiniteSpace that is the union of self with space2
+
+        '''
         spaceUnion = nx.DiGraph()
         spaceUnion.add_edges_from(self.Hasse.edges)
         spaceUnion.add_edges_from(space2.Hasse.edges)
@@ -138,14 +198,42 @@ class FiniteSpace:
 
 
     def intersection(self, space2):
+        '''
+        Parameters
+        ----------
+        space2 : a FiniteSpace with some points in common with self
+
+        Returns
+        -------
+        A new FiniteSpace that is the intersection of self with space2
+
+        '''
         intNodes = set(self.Hasse.nodes).intersection(space2.Hasse.nodes)
         return FiniteSpace(self.Hasse.subgraph(intNodes))
 
     def hasEmptyIntersection(self,space2):
+        '''
+        Parameters
+        ----------
+        space2 : a FiniteSpace.
+
+        Returns
+        -------
+        True if the intersection of self with space2 is empty
+        '''
         return len(self.intersection(space2))==0
 
-    # Returns the non-Hausdorff join of a space
     def join(self, space2):
+        '''
+        Parameters
+        ----------
+        space2 : a FiniteSpace disjoint from self.
+
+        Returns
+        -------
+        join : a FiniteSpace that is the non-Hausdorff join
+            of self with space2
+        '''
         if set(self.opens).isdisjoint(set(space2.opens)):
             join = self.union(space2)
             for q in space2.opens:
@@ -153,18 +241,28 @@ class FiniteSpace:
                     join.opens[q].add(p)
         return join
     
-    #def quotient(self, subspace):
-        # TODO 
         
     def isOpen(self):
+        '''
+        Returns
+        -------
+        True if self is a union of open sets
+
+        '''
         for p in self.opens:
             for q in self.opens[p]:
                 if q not in self.opens:
                     return False
         return True
 
-    # Determines if a set is T0
     def isT0(self):
+        '''
+        Returns
+        -------
+        True if self is T_0 (i.e., given any two points, 
+                             there exists an open set that contains one point
+                             and not the other)
+        '''
         for p in self.opens:
             for q in self.opens:
                 if (self.opens[p]==self.opens[q])&(p!=q):
@@ -172,75 +270,171 @@ class FiniteSpace:
         return True
 
     def getDownset(self,point):
+        '''
+        Parameters
+        ----------
+        point : a point from self.
+
+        Returns
+        -------
+        A FiniteSpace that is the minimal open neighborhood containing point
+        '''
         downnodes = nx.descendants(self.Hasse,point)
         downnodes.add(point)
         return FiniteSpace(self.Hasse.subgraph(downnodes))
 
     def getPuncturedDownset(self,point):
+        '''
+        Parameters
+        ----------
+        point : a point of self.
+
+        Returns
+        -------
+        A FiniteSpace that is the Downset of point, minus point
+
+        '''
         downnodes = nx.descendants(self.Hasse,point)
         return FiniteSpace(self.Hasse.subgraph(downnodes))
 
 
     def getUpset(self,point):
+        '''
+        Parameters
+        ----------
+        point : a point from self.
+
+        Returns
+        -------
+        A FiniteSpace that is the closure of point
+        '''
         upnodes = nx.ancestors(self.Hasse,point)
         upnodes.add(point)
         return FiniteSpace(self.Hasse.subgraph(upnodes))
 
     def getPuncturedUpset(self,point):
+        '''
+        Parameters
+        ----------
+        point : a point of self.
+
+        Returns
+        -------
+        A FiniteSpace that is the Upset of point, minus point
+
+        '''
         upnodes = nx.ancestors(self.Hasse,point)
         return FiniteSpace(self.Hasse.subgraph(upnodes))
 
-    # Determines if a space has a unique maximal element
     def hasUniqueMax(self):
+        '''
+        Returns
+        -------
+        True if self has a unique maximal element.
+
+        '''
         if len(self.Hasse)==0:
             self.getHasse()
         in0 = [n for n in self.Hasse.nodes if self.Hasse.in_degree(n)==0]
         return len(in0)==1
 
-    # Returns the unique maximal element of a set
     def getUniqueMax(self):
+        '''
+        If a space has a unique maximal element, it returns that element
+        
+        Returns
+        -------
+        A point from self.
+
+        '''
         if len(self.Hasse)==0:
             self.getHasse()
         in0 = [n for n in self.Hasse.nodes if self.Hasse.in_degree(n)==0]
         if len(in0)==1:
             return in0[0]
 
-    # Determines if a space has a unique minimal element
     def hasUniqueMin(self):
+        '''
+        Returns
+        -------
+        True if self has a unique minimal element.
+
+        '''
         if len(self.Hasse)==0:
             self.getHasse()
         out0 = [n for n in self.Hasse.nodes if self.Hasse.out_degree(n)==0]
         return len(out0)==1
 
-    # Returns the unique minimal element of a set
     def getUniqueMin(self):
+        '''
+        If self has a unique minimal element, it returns that element
+
+        Returns
+        -------
+        A point of self.
+
+        '''
         if len(self.Hasse)==0:
             self.getHasse()
         out0 = [n for n in self.Hasse.nodes if self.Hasse.out_degree(n)==0]
         if len(out0)==1:
             return out0[0]
 
-    # Determines if a point in a space is beat
     def isBeat(self,point):
+        '''
+        Determines if either the punctured upset of point has a unique min,
+            or the punctured downset of point has a unique max
+
+        Parameters
+        ----------
+        point : a point of self.
+
+        Returns
+        -------
+        True if point is beat.
+
+        '''
         test1 = self.Hasse.in_degree(point)==1
         test2 = self.Hasse.out_degree(point)==1
         return (test1|test2)
 
-    # Determines if a space has a beat point
     def hasBeat(self):
+        '''
+        Returns
+        -------
+        bool
+            True if any points of self are beat.
+
+        '''
         for p in self.points:
             if self.isBeat(p):
                 return True
 
-    # How can I control the randomness of this method?
     def getBeat(self):
+        '''
+        Returns an arbitrary beat point of self                
+        Returns
+        -------
+        p : the name of a point in self.
+
+        '''
         for p in self.points:
             if self.isBeat(p):
                 return p
 
-    # Returns an ordered pair indicating if the space has a beat point,
-    # and if so, what that beat point is
     def hasGetBeat(self):
+        '''
+        Determines if self has a beat point, and if so, what that beat point is
+        Note: the beat point may not be unique!
+            
+        Returns
+        -------
+        bool
+            True if self has a beat point, False if it doesn't.
+        TYPE
+            The name of the beat point, or an empty string.
+
+        '''
         for p in self.points:
             if self.isBeat(p):
                 return (True,p)
@@ -248,25 +442,41 @@ class FiniteSpace:
 
 
     def delBeat(self,point):
-        # copy the old Hasse diagram, then delete the old point
+        '''
+        Returns a strong deformation retract of self onto self-{point}
+        This should only be run if "point" is beat
+
+        Parameters
+        ----------
+        point : the name of a point in self, as a string.
+
+        Returns
+        -------
+        A FiniteSpace that is self-{point}.
+
+        '''
         newGraph = nx.DiGraph()
         newGraph.add_nodes_from(self.Hasse.nodes)
         newGraph.add_edges_from(self.Hasse.edges)
         newGraph.remove_node(point)
 
-        # Restore the edges that were deleted
         for p in nx.ancestors(self.Hasse,point):
             for q in nx.descendants(self.Hasse,point):
                 newGraph.add_edge(p,q)
-        # Remove any redundant edges
+
         newGraph = nx.transitive_reduction(newGraph)
         return FiniteSpace(newGraph)
 
 
-    # Probably gets the core of a finite space
-    # by randomly removing beat points
     def getCore(self):
-        #core = self.copy()
+        '''
+        Returns a strong deformation retract of self that contains no beat points 
+
+        Returns
+        -------
+        core : a FiniteSpace that has no beat points.
+
+        '''
         core = self
         (y,p) = core.hasGetBeat()
         while(y):
@@ -274,17 +484,34 @@ class FiniteSpace:
             (y,p) = core.hasGetBeat()
         return core
 
-    # Determines if a space is contractible
     def isContractible(self):
-        # print("Checking contractiblity of "+str(self.points))
+        '''
+        Determines if self is contractible.
+            If self only has 2 maximal elements, it checks to see if the intersection of the downsets of those two max elts is contractible
+            Otherwise, it gets the core of the entire space
+
+        Returns
+        -------
+        bool
+            True if the core of self is 1 point.
+
+        '''
         maxs = list(self.getMaxs())
         if len(maxs)==2:
             return self.twoDownContractible(maxs[0],maxs[1])
         else:
             return len(self.getCore().points)==1
 
-    # Determines if each component of a space is contractible
     def isContractibleComponents(self):
+        '''
+        Determines if self is a union of contractible sets
+
+        Returns
+        -------
+        bool
+            True if self is a union of contractible open sets.
+
+        '''
         comps = nx.weakly_connected_components(self.Hasse)
         for comp in comps:
             if not FiniteSpace(self.Hasse.subgraph(comp)).isContractible():

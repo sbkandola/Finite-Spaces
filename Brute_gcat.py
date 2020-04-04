@@ -7,9 +7,7 @@ Created on Sun Mar 15 09:37:38 2020
 
 # Class for brute-force calculating the geometric category of a finite space
 
-import FiniteSpaces_Class as FS
 import FiniteSpace_Examples as FE
-import networkx as nx
 
 
 def partition(maxs):
@@ -17,13 +15,11 @@ def partition(maxs):
 
     Parameters
     ----------
-    maxs : TYPE
-        DESCRIPTION.
+    maxs : a list of elements.
 
     Yields
     ------
-    TYPE
-        DESCRIPTION.
+    A generator of all possible partitionings of those elements.
 
     '''
     if len(maxs) == 1:
@@ -32,19 +28,43 @@ def partition(maxs):
 
     first = maxs[0]
     for smaller in partition(maxs[1:]):
-        # insert `first` in each of the subpartition's subsets
         for n, subset in enumerate(smaller):
             yield smaller[:n] + [[ first ] + subset]  + smaller[n+1:]
-        # put `first` in its own subset 
         yield [ [ first ] ] + smaller
         
 def is_gcat_cover(space, part):
+    '''
+    
+
+    Parameters
+    ----------
+    space : a finite topological space from FiniteSpaces_Class.
+    part : a partitioning of the maximal elements of space.
+
+    Returns
+    -------
+    True if every open set of SPACE determined by PART is contractible,
+    and False if at least one of the open sets is not contractible.
+
+    '''
     for p in part:
         if not(space.getOpens(set(p)).isContractible()):
             return False
     return True
 
 def get_brute_gcat(space):
+    '''
+    
+
+    Parameters
+    ----------
+    space : a finite topological space from FiniteSpaces_Class.
+
+    Returns
+    -------
+    gc : the minimal number of contractible open sets required to cover SPACE
+
+    '''
     maxs = space.getMaxs()
     gc = len(maxs)
     for part in partition(list(maxs)):
@@ -59,7 +79,6 @@ if __name__=='__main__':
     K = FE.Build_Klein()
     S = FE.Build_MinCircle()
     
-    print("This happened")
     
     for part in partition(list(S.getMaxs())):
         print(is_gcat_cover(S,part))

@@ -11,6 +11,15 @@ import FiniteSpaces_Class as FS
 import networkx as nx
 
 def Build_Klein():
+    '''
+    
+
+    Returns
+    -------
+    Klein : returns the minimal finite model of the Klein bottle 
+        as an object of FiniteSpaces_Class.
+
+    '''
     Klein = FS.FiniteSpace(dict({
             'a1': set({'a1', 'b1', 'b2','b3','b4','c1','c2','c3','c4'}),
             'a2': set({'a2', 'b1', 'b2','b5','b6','c1','c2','c3','c4'}),
@@ -31,6 +40,15 @@ def Build_Klein():
     return Klein
 
 def Build_MinCircle():
+    '''
+    
+
+    Returns
+    -------
+    MinCircle : The minimal finite model of S^1 
+        as an object of FiniteSpaces_Class.
+
+    '''
     MinCircle = FS.FiniteSpace(dict({'a': set({'a','c','d'}),
            'b': set({'b','c','d'}),
            'c': set({'c'}),
@@ -38,6 +56,14 @@ def Build_MinCircle():
     return MinCircle
 
 def Build_SixCircle():
+    '''
+    
+
+    Returns
+    -------
+    SixCircle : A 6-point model of S^1 as an object from FiniteSpaces_Class.
+
+    '''
 
     SixCircle = FS.FiniteSpace(dict({
             'y0': set({'y0','x0','x1'}),
@@ -50,6 +76,14 @@ def Build_SixCircle():
     return SixCircle
 
 def Build_TenCircle():
+    '''
+    
+
+    Returns
+    -------
+    TenCircle : A 10-point model of S^1 as an object from FiniteSpaces_Class.
+
+    '''
     TenCircle = FS.FiniteSpace(dict({
             'y0': set({'y0','x0','x1'}),
             'y1': set({'y1','x1','x2'}),
@@ -65,26 +99,71 @@ def Build_TenCircle():
     return TenCircle
 
 def Build_MinTorus():
+    '''
+    
+
+    Returns
+    -------
+    MinTorus : the minimal finite model of a Torus
+        as an object from FiniteSpaces_Class.
+
+    '''
     MinCircle = Build_MinCircle()
     MinTorus = MinCircle.product(MinCircle)
     return MinTorus
 
 def Build_SixTorus():
+    '''
+    
+
+    Returns
+    -------
+    SixTorus : A 36-point model of a Torus
+        as an object from FiniteSpaces_Class.
+
+    '''
     SixCircle = Build_SixCircle()
     SixTorus = SixCircle.product(SixCircle)
     return SixTorus
 
 def Build_TenTorus():
+    '''
+    
+
+    Returns
+    -------
+    TenTorus : A 100-point model of a Torus
+        as an object from FiniteSpaces_Class.
+
+    '''
     TenCircle = Build_TenCircle()
     TenTorus = TenCircle.product(TenCircle)
     return TenTorus
 
 def Build_KleinSquared():
+    '''
+    
+
+    Returns
+    -------
+    KleinSquared : The square of the Klein bottle
+        as an object from FiniteSpaces_Class.
+
+    '''
     Klein = Build_Klein()
     KleinSquared = Klein.product(Klein)
     return KleinSquared
 
 def Build_Disjoint():
+    '''
+    
+
+    Returns
+    -------
+    The disjoint union of two minimal models of [0,1]
+        as an object from FiniteSpaces_Class.
+
+    '''
     disjointHasse = nx.DiGraph()
     disjointHasse.add_nodes_from('abcd')
     disjointHasse.add_edge('a','b')
@@ -96,7 +175,3 @@ if __name__=='__main__':
     print(Klein.opens)
     Klein.drawHasse()
 
-    # start = time.time()
-    # print(K2.gcat())
-    # end = time.time()
-    # print(end-start)
