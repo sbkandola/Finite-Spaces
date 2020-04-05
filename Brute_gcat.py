@@ -38,12 +38,13 @@ def is_gcat_cover(space, part):
 
     Parameters
     ----------
-    space : a finite topological space from FiniteSpaces_Class.
+    space : a FiniteSpace
     part : a partitioning of the maximal elements of space.
 
     Returns
     -------
-    True if every open set of SPACE determined by PART is contractible,
+    bool
+        True if every open set of SPACE determined by PART is contractible,
     and False if at least one of the open sets is not contractible.
 
     '''

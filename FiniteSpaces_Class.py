@@ -518,8 +518,23 @@ class FiniteSpace:
                 return False
         return True
 
-    # Determines if the union of two downsets is contractible
     def twoDownContractible(self, max1, max2):
+        '''
+        
+
+        Parameters
+        ----------
+        max1 : str
+            The name of a point of self.
+        max2 : str
+            The name of a point of self.
+
+        Returns
+        -------
+        bool
+            DESCRIPTION.
+
+        '''
         space1 = self.getDownset(max1)
         space2 = self.getDownset(max2)
         S1intS2 = space1.intersection(space2)
