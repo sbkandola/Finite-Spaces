@@ -120,27 +120,36 @@ class FiniteSpace:
 
     def isleq(self,p1,p2):
         '''
+        
+
         Parameters
         ----------
-        p1 : a point of the space.
-        p2 : another point of the space.
+        p1 : str
+            The name of a point in self.
+        p2 : str
+            The name of a different point in self.
 
         Returns
         -------
-        True if p1 <= p2.
+        bool
+            True if p1 <= p2.
 
         '''
         return self.opens[p1].issubset(self.opens[p2])
 
     def product(self, space2):
         '''
+        
+
         Parameters
         ----------
-        space2 : an instance of FiniteSpaces_Class.
+        space2 : FiniteSpace
+            Any FiniteSpace. There can be an overlap in points.
 
         Returns
         -------
-        A new finite space that is the product of self with space2.
+        FiniteSpace
+            The Cartesian product of self and space2.
 
         '''
         prod = dict()
@@ -156,9 +165,12 @@ class FiniteSpace:
 
     def op(self):
         '''
+        
+
         Returns
         -------
-        The dual space of self as a Finite Space
+        FiniteSpace
+            The dual space of self.
 
         '''
         if len(self.Hasse)==0:
@@ -168,9 +180,12 @@ class FiniteSpace:
 
     def copy(self):
         '''
+        
+
         Returns
         -------
-        A new copy of self as a finite space.
+        FiniteSpace
+            A copy of the space that can be modified without changing the original.
 
         '''
         copyGraph = nx.DiGraph()
@@ -180,14 +195,16 @@ class FiniteSpace:
 
     def union(self,space2):
         '''
+        
+
         Parameters
         ----------
-        space2 : a finite space whose points are disjoint from self.
-            It will cause trouble in the long run if there are duplicate points!
+        space2 : FiniteSpace
 
         Returns
         -------
-        A new FiniteSpace that is the union of self with space2
+        FiniteSpace
+            the union of self with space2.
 
         '''
         spaceUnion = nx.DiGraph()
@@ -199,13 +216,17 @@ class FiniteSpace:
 
     def intersection(self, space2):
         '''
+        
+
         Parameters
         ----------
-        space2 : a FiniteSpace with some points in common with self
+        space2 : FiniteSpace
+            another finite space.
 
         Returns
         -------
-        A new FiniteSpace that is the intersection of self with space2
+        FiniteSpace
+            the intersection of self with space2.
 
         '''
         intNodes = set(self.Hasse.nodes).intersection(space2.Hasse.nodes)
@@ -213,26 +234,35 @@ class FiniteSpace:
 
     def hasEmptyIntersection(self,space2):
         '''
+        
+
         Parameters
         ----------
-        space2 : a FiniteSpace.
+        space2 : FiniteSpace
+            a finite space.
 
         Returns
         -------
-        True if the intersection of self with space2 is empty
+        bool
+            Returns true if self and space2 have no points in common.
+
         '''
         return len(self.intersection(space2))==0
 
     def join(self, space2):
         '''
+        
+
         Parameters
         ----------
-        space2 : a FiniteSpace disjoint from self.
+        space2 : FiniteSpace
+            A finite space with points different from self
 
         Returns
         -------
-        join : a FiniteSpace that is the non-Hausdorff join
-            of self with space2
+        join : FiniteSpace
+            The non-Hausdroff join of self with space2.
+
         '''
         if set(self.opens).isdisjoint(set(space2.opens)):
             join = self.union(space2)
@@ -470,11 +500,10 @@ class FiniteSpace:
 
     def getCore(self):
         '''
-        Returns a strong deformation retract of self that contains no beat points 
-
         Returns
         -------
-        core : a FiniteSpace that has no beat points.
+        core : FiniteSpace
+            A space homotopy equivalent to self that has no beat points.
 
         '''
         core = self
@@ -564,12 +593,12 @@ class FiniteSpace:
 
     def buildMaxCat(self):
         '''
-        
+        Approximates the geometric category of a finite space
 
         Returns
         -------
-        maxCover : TYPE
-            DESCRIPTION.
+        maxCover : list
+            Returns a list of finite spaces whose union covers self.
 
         '''
         maxCover = []
