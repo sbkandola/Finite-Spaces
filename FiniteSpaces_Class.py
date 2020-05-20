@@ -533,7 +533,7 @@ class FiniteSpace:
 
     def isContractibleComponents(self):
         '''
-        Determines if self is a union of contractible sets
+        Determines if self is a disjoint union of contractible sets
 
         Returns
         -------
@@ -574,6 +574,15 @@ class FiniteSpace:
 
     # Returns a SET of the maximal elements of a SPACE
     def getMaxs(self):
+        '''
+        Gets the maximal elements of a space.
+
+        Returns
+        -------
+        maxs : list
+            A list of strings that are the names of the maximal elements of self.
+
+        '''
         if not self.Hasse:
             self.getHasse()
         maxs = set(n for n in self.Hasse.nodes if self.Hasse.in_degree(n)==0)
@@ -581,15 +590,16 @@ class FiniteSpace:
 
     # Greedy algorithm builds the largest contratctible subset
     # # of a space that it can by randomly adding other downsets
-    def buildMaxContractible(self):
-        maxs = self.getMaxs()
-        candidate = self.getDownset(maxs.pop())
-        while len(maxs)>0:
-            nextSet = self.getDownset(maxs.pop())
-            nextNextSet = candidate.union(nextSet)
-            if nextNextSet.isContractible():
-                candidate = candidate.union(nextNextSet)
-        return candidate
+    # Probably don't need this anymore
+    # def buildMaxContractible(self):
+    #     maxs = self.getMaxs()
+    #     candidate = self.getDownset(maxs.pop())
+    #     while len(maxs)>0:
+    #         nextSet = self.getDownset(maxs.pop())
+    #         nextNextSet = candidate.union(nextSet)
+    #         if nextNextSet.isContractible():
+    #             candidate = candidate.union(nextNextSet)
+    #     return candidate
 
     def buildMaxCat(self):
         '''
@@ -605,18 +615,19 @@ class FiniteSpace:
         maxs = self.getMaxs()
         m = maxs.pop()
         maxCover.append(self.getDownset(m))
-        unHasse = self.Hasse.to_undirected()
-        unHasse_dict = nx.shortest_path_length(unHasse, m)
-        sorted_dict = sorted(unHasse_dict.items(), key=operator.itemgetter(1))
-        sorted_maxs = [key[0] for key in sorted_dict if key[0] in maxs]
-        for m in sorted_maxs:
-            #print('working on m =',m)
+        # unHasse = self.Hasse.to_undirected()
+        # unHasse_dict = nx.shortest_path_length(unHasse, m)
+        # sorted_dict = sorted(unHasse_dict.items(), key=operator.itemgetter(1))
+        # sorted_maxs = [key[0] for key in sorted_dict if key[0] in maxs]
+        for m in maxs:
+            # print('working on m =',m)
             #print('Current cover list is ', [ cover.getMaxs() for cover in maxCover])
             found = False
             nextMax = self.getDownset(m)
             for c in range(len(maxCover)):
                testUnion = maxCover[c].union(nextMax)
-               if (testUnion.isContractibleComponents()) or (nextMax.hasEmptyIntersection(maxCover[c])):
+               #if (testUnion.isContractibleComponents() or nextMax.hasEmptyIntersection(maxCover[c])):
+               if (testUnion.isContractibleComponents()):
                    maxCover[c] = testUnion
                    found = True
                    break
@@ -638,7 +649,7 @@ class FiniteSpace:
         return FiniteSpace(self.Hasse.subgraph(newElts))
 
 
-    # Estimates the gcat of a space
+    # Estimates the gcat of a space -- BROKEN
     def gcat(self):
         maxs = self.getMaxs()
         gc = 0
