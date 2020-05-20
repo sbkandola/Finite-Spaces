@@ -649,16 +649,9 @@ class FiniteSpace:
         return FiniteSpace(self.Hasse.subgraph(newElts))
 
 
-    # Estimates the gcat of a space -- BROKEN
+    # Estimates the gcat of a space
     def gcat(self):
-        maxs = self.getMaxs()
-        gc = 0
-        while len(maxs)>0:
-            cover = self.getOpens(maxs).buildMaxContractible()
-            usedMaxs = cover.getMaxs()
-            maxs.difference_update(usedMaxs)
-            gc = gc + 1
-        return gc
+        return len(self.buildMaxCat())
 
     # gets the height of a point in a Hasse diagram
     def getHeight(self,point):
