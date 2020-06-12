@@ -29,6 +29,10 @@ class FiniteSpace:
             self.closures = dict()
             self.Hasse = nx.DiGraph()
             self.getHasse()
+            self.adjacencies = nx.Graph()
+            for v in self.points:
+                for u in nx.descendants(self.Hasse, v):
+                    self.adjacencies.add_edge(v, u)
 
             # From opens, construct Hasse diagram, keep in self.Hasse
 
@@ -57,6 +61,10 @@ class FiniteSpace:
             self.opens = dict()
             self.closures = dict()
             self.Hasse = inputData
+            self.adjacencies = nx.Graph()
+            for v in self.points:
+                for u in nx.descendants(inputData, v):
+                    self.adjacencies.add_edge(v, u)
 
         else:
             print('I did not recognize your input type. Exiting.')
@@ -614,12 +622,17 @@ class FiniteSpace:
         maxCover = []
         maxs = self.getMaxs()
         m = maxs.pop()
+        print("Starting max is "+str(m))
         maxCover.append(self.getDownset(m))
-        # unHasse = self.Hasse.to_undirected()
-        # unHasse_dict = nx.shortest_path_length(unHasse, m)
-        # sorted_dict = sorted(unHasse_dict.items(), key=operator.itemgetter(1))
-        # sorted_maxs = [key[0] for key in sorted_dict if key[0] in maxs]
-        for m in maxs:
+        unHasse = self.Hasse.to_undirected()
+        dist_dict = nx.shortest_path_length(self.adjacencies, m)
+        for k in dist_dict:
+            print(str(k)+" "+str(dist_dict.get(k)))
+        sorted_dict = sorted(dist_dict.items(), key=operator.itemgetter(1))
+        print(sorted_dict)
+        sorted_maxs = [key[0] for key in sorted_dict if key[0] in maxs]
+        print("Order is "+str(sorted_maxs))
+        for m in sorted_maxs:
             # print('working on m =',m)
             #print('Current cover list is ', [ cover.getMaxs() for cover in maxCover])
             found = False
