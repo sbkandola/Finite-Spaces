@@ -39,6 +39,25 @@ def Build_Klein():
             'c4': set({'c4'})}))
     return Klein
 
+def Build_NotCont():
+    NotCont = FS.FiniteSpace(dict({
+        'x1': set({'x1','y1','y2','z1','z2'}),
+        'x2': set({'x2','y1','y2','y3','z1','z2'}),
+        'x3': set({'x3','y3','y4','y5','z3','z4'}),
+        'x4': set({'x4','y4','y5','z3','z4'}),
+        'y1': set({'y1','z1','z2'}),
+        'y2': set({'y2','z1','z2'}),
+        'y3': set({'y3'}),
+        'y4': set({'y4','z3','z4'}),
+        'y5': set({'y5','z3','z4'}),
+        'z1': set({'z1'}),
+        'z2': set({'z2'}),
+        'z3': set({'z3'}),
+        'z4': set({'z4'})
+        }))
+    return NotCont
+    
+
 def Build_MinCircle():
     '''
     
@@ -72,6 +91,28 @@ def Build_SixCircle():
             'x0': set({'x0'}),
             'x1': set({'x1'}),
             'x2': set({'x2'})
+        }))
+    return SixCircle
+
+def Build_EightCircle():
+    '''
+    
+
+    Returns
+    -------
+    SixCircle : A 6-point model of S^1 as an object from FiniteSpaces_Class.
+
+    '''
+
+    SixCircle = FS.FiniteSpace(dict({
+            'y0': set({'y0','x0','x1'}),
+            'y1': set({'y1','x1','x2'}),
+            'y2': set({'y2','x2','x3'}),
+            'y3': set({'y3','x3','x0'}),
+            'x0': set({'x0'}),
+            'x1': set({'x1'}),
+            'x2': set({'x2'}),
+            'x3': set({'x3'})
         }))
     return SixCircle
 

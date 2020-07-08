@@ -624,7 +624,6 @@ class FiniteSpace:
         m = maxs.pop()
         print("Starting max is "+str(m))
         maxCover.append(self.getDownset(m))
-        unHasse = self.Hasse.to_undirected()
         dist_dict = nx.shortest_path_length(self.adjacencies, m)
         for k in dist_dict:
             print(str(k)+" "+str(dist_dict.get(k)))
