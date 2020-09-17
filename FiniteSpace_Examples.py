@@ -10,6 +10,19 @@ Created on Wed Feb  5 10:33:45 2020
 import FiniteSpaces_Class as FS
 import networkx as nx
 
+def Build_Test_SC():
+    SC = FS.FiniteSpace(dict({
+        'abc': set({'abc','ab','ac','bc'}),
+        'ab': set({'ab','a','b'}),
+        'ac': set({'ac','a','c'}),
+        'bc': set({'bc','b','c'}),
+        'ad': set({'ad','a','d'}),
+        'a': set({'a'}),
+        'b': set({'b'}),
+        'c': set({'c'}),
+        'd': set({'d'})}))
+    return SC
+
 def Build_Klein():
     '''
     
@@ -210,6 +223,21 @@ def Build_Disjoint():
     disjointHasse.add_edge('a','b')
     disjointHasse.add_edge('c','d')
     return FS.FiniteSpace(disjointHasse)
+
+def Build_Int3():
+    '''
+    
+
+    Returns
+    -------
+    MinCircle : The minimal finite model of S^1 
+        as an object of FiniteSpaces_Class.
+
+    '''
+    Int3 = FS.FiniteSpace(dict({'b': set({'a','b','c'}),
+           'a': set({'a'}),
+           'c': set({'c'})}))
+    return Int3
 
 if __name__=='__main__':
     Klein = Build_Klein()
