@@ -147,7 +147,7 @@ class FiniteSpace:
 
     def product(self, space2):
         '''
-        
+        NEED TO FIX THIS TO TAKE DIGRAPHS        
 
         Parameters
         ----------
@@ -161,8 +161,8 @@ class FiniteSpace:
 
         '''
         prod = dict()
-        for p in self.opens:
-            for q in space2.opens:
+        for p in self.points:
+            for q in space2.points:
                 prod[p+','+q] = set()
         for p in prod:
             points = p.rsplit(',',1)
@@ -418,6 +418,30 @@ class FiniteSpace:
         if len(out0)==1:
             return out0[0]
 
+    def beatRetract(self,point):
+        '''
+        
+
+        Parameters
+        ----------
+        point : STRING
+            Name of a point in a FiniteSpace.
+
+        Returns
+        -------
+        None.
+
+        '''
+        upbeat = self.Hasse.in_degree(point)==1
+        downbeat = self.Hasse.out_degree(point)==1
+        
+        if upbeat:
+            up = list(self.Hasse.predecessors(point))[0]
+            return up
+        elif downbeat:
+            down = list(self.Hasse.successors(point))[0]
+            return down
+    
     def isBeat(self,point):
         '''
         Determines if either the punctured upset of point has a unique min,
@@ -432,9 +456,9 @@ class FiniteSpace:
         True if point is beat.
 
         '''
-        test1 = self.Hasse.in_degree(point)==1
-        test2 = self.Hasse.out_degree(point)==1
-        return (test1|test2)
+        upbeat = self.Hasse.in_degree(point)==1
+        downbeat = self.Hasse.out_degree(point)==1
+        return (upbeat|downbeat)
 
     def hasBeat(self):
         '''
@@ -477,6 +501,24 @@ class FiniteSpace:
             if self.isBeat(p):
                 return (True,p)
         return (False,'')
+    
+    def hasGetBeatRetract(self):
+        '''
+        Determines if self has a beat point, and if so, what that beat point is
+        Note: the beat point may not be unique!
+            
+        Returns
+        -------
+        bool
+            True if self has a beat point, False if it doesn't.
+        TYPE
+            The name of the beat point, or an empty string.
+
+        '''
+        for p in self.points:
+            if self.isBeat(p):
+                return (True,p,self.beatRetract(p))
+        return (False,'','')
 
 
     def delBeat(self,point):
@@ -506,6 +548,18 @@ class FiniteSpace:
         return FiniteSpace(newGraph)
 
 
+    def getRetract(self):
+        deformation = list()
+        core = self
+        (y,p,q) = core.hasGetBeatRetract()
+        while(y):
+            deformation.append((p,q))
+            core = core.delBeat(p)
+            (y,p,q) = core.hasGetBeatRetract()
+        return deformation
+        
+        
+    
     def getCore(self):
         '''
         Returns
@@ -516,9 +570,11 @@ class FiniteSpace:
         '''
         core = self
         (y,p) = core.hasGetBeat()
+        # print(p)
         while(y):
             core = core.delBeat(p)
             (y,p) = core.hasGetBeat()
+            #print(p)
         return core
 
     def isContractible(self):
@@ -622,15 +678,15 @@ class FiniteSpace:
         maxCover = []
         maxs = self.getMaxs()
         m = maxs.pop()
-        print("Starting max is "+str(m))
+        ##print("Starting max is "+str(m))
         maxCover.append(self.getDownset(m))
         dist_dict = nx.shortest_path_length(self.adjacencies, m)
-        for k in dist_dict:
-            print(str(k)+" "+str(dist_dict.get(k)))
+        ##for k in dist_dict:
+            ##print(str(k)+" "+str(dist_dict.get(k)))
         sorted_dict = sorted(dist_dict.items(), key=operator.itemgetter(1))
-        print(sorted_dict)
+        ##print(sorted_dict)
         sorted_maxs = [key[0] for key in sorted_dict if key[0] in maxs]
-        print("Order is "+str(sorted_maxs))
+        ## print("Order is "+str(sorted_maxs))
         for m in sorted_maxs:
             # print('working on m =',m)
             #print('Current cover list is ', [ cover.getMaxs() for cover in maxCover])
@@ -709,4 +765,4 @@ class FiniteSpace:
         if len(self.Hasse)==0:
             self.getHasse()
         pos = self.findDrawingPositions()
-        nx.draw(self.Hasse,pos, with_labels = True, node_color = 'purple', font_color = 'grey', font_weight = 'bold')
+        nx.draw(self.Hasse,pos, with_labels = True, node_size = 500, node_color = 'orange', font_color = 'teal', font_weight = 'bold')
