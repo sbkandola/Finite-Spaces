@@ -146,30 +146,24 @@ class FiniteSpace:
         return self.opens[p1].issubset(self.opens[p2])
 
     def product(self, space2):
-        '''
-        NEED TO FIX THIS TO TAKE DIGRAPHS        
-
-        Parameters
-        ----------
-        space2 : FiniteSpace
-            Any FiniteSpace. There can be an overlap in points.
-
-        Returns
-        -------
-        FiniteSpace
-            The Cartesian product of self and space2.
-
-        '''
-        prod = dict()
+        s1xs2 = nx.DiGraph()
+        prod = []
         for p in self.points:
             for q in space2.points:
-                prod[p+','+q] = set()
-        for p in prod:
-            points = p.rsplit(',',1)
-            for q in self.opens[points[0]]:
-                for r in space2.opens[points[1]]:
-                    prod[p].add(q+','+r)
-        return FiniteSpace(prod)
+                prod.append(p+','+q)
+        s1xs2.add_nodes_from(prod)
+        
+        for pair in prod: 
+            points = pair.rsplit(',',1)
+            for p in self.getDownset(points[0]).points:
+                for q in space2.getDownset(points[1]).points:
+                    target = p+','+q
+                    if pair != target:
+                        s1xs2.add_edge(pair,target)
+        s1xs2 = nx.transitive_reduction(s1xs2)
+        
+        return FiniteSpace(s1xs2)
+    
 
     def op(self):
         '''
@@ -306,6 +300,36 @@ class FiniteSpace:
                 if (self.opens[p]==self.opens[q])&(p!=q):
                     return False
         return True
+    
+    def isConnected(self):
+        '''
+        Determines if a FiniteSpace is path-connected
+
+        Returns
+        -------
+        True if self is connected. False otherwise.
+
+        '''
+        return(nx.is_weakly_connected(self.Hasse))
+    
+    def getPath(self,a,b):
+        '''
+        
+
+        Parameters
+        ----------
+        a : string
+            a point of a FiniteSpace.
+        b : string
+            a point of a FiniteSpace.
+
+        Returns
+        -------
+        list containing a zigzag of points from a to b.
+
+        '''
+        return(nx.shortest_path(self.adjacencies, a, b))
+        
 
     def getDownset(self,point):
         '''
