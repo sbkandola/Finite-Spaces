@@ -8,7 +8,7 @@ Created on Mon Jan 20 18:12:47 2020
 import networkx as nx
 import numpy as np
 import operator
-
+import random
 
 
 class FiniteSpace:
@@ -146,6 +146,21 @@ class FiniteSpace:
         return self.opens[p1].issubset(self.opens[p2])
 
     def product(self, space2):
+        '''
+        
+
+        Parameters
+        ----------
+        space2 : FiniteSpace
+            A FiniteSpace whose point names do not already contain commas.
+            If self != space2, the points should have DIFFERENT NAMES.
+
+        Returns
+        -------
+        FiniteSpace
+            The product of self with space2.
+
+        '''
         s1xs2 = nx.DiGraph()
         prod = []
         for p in self.points:
@@ -264,14 +279,34 @@ class FiniteSpace:
         -------
         join : FiniteSpace
             The non-Hausdroff join of self with space2.
+            space2 is the "top" space
 
         '''
-        if set(self.opens).isdisjoint(set(space2.opens)):
+        if set(self.points).isdisjoint(set(space2.points)):
             join = self.union(space2)
             for q in space2.opens:
                 for p in self.opens:
                     join.opens[q].add(p)
         return join
+    
+    
+    def randomize(self, prob, connected):
+        randomSpace = nx.DiGraph()
+                
+        for p in self.points:
+            for q in self.points:
+                if (p!=q) and (random.random() < prob):
+                    randomSpace.add_edge(p,q)
+                    if nx.is_weakly_connected(randomSpace)==connected:
+                        try:
+                            nx.find_cycle(randomSpace)
+                            randomSpace.remove_edge(p, q)
+                        except:
+                            pass
+        randomSpace = nx.transitive_reduction(randomSpace)
+                        
+        return FiniteSpace(randomSpace)
+                        
     
         
     def isOpen(self):
@@ -281,9 +316,11 @@ class FiniteSpace:
         True if self is a union of open sets
 
         '''
-        for p in self.opens:
-            for q in self.opens[p]:
-                if q not in self.opens:
+        for p in self.points:
+            pDown = self.getDownset(p)
+            for q in pDown.points:
+                qDown = self.getDownset(q)
+                if not(set(qDown.points).issubset(set(self.points))):
                     return False
         return True
 
@@ -341,9 +378,7 @@ class FiniteSpace:
         -------
         A FiniteSpace that is the minimal open neighborhood containing point
         '''
-        downnodes = nx.descendants(self.Hasse,point)
-        downnodes.add(point)
-        return FiniteSpace(self.Hasse.subgraph(downnodes))
+        return FiniteSpace(nx.dfs_tree(self.Hasse,point))
 
     def getPuncturedDownset(self,point):
         '''
@@ -689,7 +724,7 @@ class FiniteSpace:
     #             candidate = candidate.union(nextNextSet)
     #     return candidate
 
-    def buildMaxCat(self):
+    def getCatCover(self):
         '''
         Approximates the geometric category of a finite space
 
@@ -710,7 +745,8 @@ class FiniteSpace:
         sorted_dict = sorted(dist_dict.items(), key=operator.itemgetter(1))
         ##print(sorted_dict)
         sorted_maxs = [key[0] for key in sorted_dict if key[0] in maxs]
-        ## print("Order is "+str(sorted_maxs))
+        # random.shuffle(sorted_maxs)
+        # print("Order is "+str(sorted_maxs))
         for m in sorted_maxs:
             # print('working on m =',m)
             #print('Current cover list is ', [ cover.getMaxs() for cover in maxCover])
@@ -735,15 +771,13 @@ class FiniteSpace:
         newElts = set(elts)
         #newElts = set()
         for e in elts:
-            #newElts.add(e)
-            #newElts.add(set({nx.descendants(self.Hasse,e)}))
             newElts = newElts.union(set(nx.descendants(self.Hasse,e)))
         return FiniteSpace(self.Hasse.subgraph(newElts))
 
 
     # Estimates the gcat of a space
     def gcat(self):
-        return len(self.buildMaxCat())
+        return len(self.getCatCover())
 
     # gets the height of a point in a Hasse diagram
     def getHeight(self,point):
