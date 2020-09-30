@@ -124,7 +124,7 @@ class FiniteSpace:
         True if p1 >= p2.
 
         '''
-        return self.opens[p1].issuperset(self.opens[p2])
+        return (p2 in self.Hasse.successors(p1))
 
     def isleq(self,p1,p2):
         '''
@@ -143,7 +143,7 @@ class FiniteSpace:
             True if p1 <= p2.
 
         '''
-        return self.opens[p1].issubset(self.opens[p2])
+        return (p1 in self.Hasse.successors(p2))
 
     def product(self, space2):
         '''
@@ -494,12 +494,13 @@ class FiniteSpace:
         upbeat = self.Hasse.in_degree(point)==1
         downbeat = self.Hasse.out_degree(point)==1
         
-        if upbeat:
-            up = list(self.Hasse.predecessors(point))[0]
-            return up
-        elif downbeat:
+        if downbeat:
             down = list(self.Hasse.successors(point))[0]
             return down
+        elif upbeat:
+            up = list(self.Hasse.predecessors(point))[0]
+            return up
+        
     
     def isBeat(self,point):
         '''
@@ -616,6 +617,40 @@ class FiniteSpace:
             core = core.delBeat(p)
             (y,p,q) = core.hasGetBeatRetract()
         return deformation
+    
+    def hasGet2Chain(self):
+        for m in self.getMaxs():
+            if len(self.getPuncturedDownset(m))>0:
+                for n in self.Hasse.successors(m):
+                    if len(self.getPuncturedDownset(n))>0:
+                        return (True,n)
+                    else:
+                        return (False,'')
+                    
+    
+    def getCatPath(self,a):
+        if len(self.getCore())!=1:
+            print("Space is not contractible.")
+            return
+        else:
+            deformation = self.getRetract()
+            core = deformation[len(deformation)-1][1]
+            path = list()
+            path.append(a)
+            while core not in path:
+                last = path[len(path)-1]
+                next_point = [pair[1] for pair in deformation if pair[0]==last][0]
+                path.append(next_point)
+            
+            path_space = FiniteSpace(self.Hasse.subgraph(set(path)))
+            (y,p) = path_space.hasGet2Chain()
+            while y:
+                path_space = path_space.delBeat(p)
+                (y,p) = path_space.hasGet2Chain()
+                
+                
+            return path_space
+        
         
         
     
