@@ -378,7 +378,9 @@ class FiniteSpace:
         -------
         A FiniteSpace that is the minimal open neighborhood containing point
         '''
-        return FiniteSpace(nx.dfs_tree(self.Hasse,point))
+        downnodes = nx.descendants(self.Hasse,point)
+        downnodes = downnodes.union(set({point}))
+        return FiniteSpace(self.Hasse.subgraph(downnodes))
 
     def getPuncturedDownset(self,point):
         '''
@@ -772,7 +774,7 @@ class FiniteSpace:
         maxCover = []
         maxs = self.getMaxs()
         m = maxs.pop()
-        ##print("Starting max is "+str(m))
+        #print("Starting max is "+str(m))
         maxCover.append(self.getDownset(m))
         dist_dict = nx.shortest_path_length(self.adjacencies, m)
         ##for k in dist_dict:
@@ -780,10 +782,9 @@ class FiniteSpace:
         sorted_dict = sorted(dist_dict.items(), key=operator.itemgetter(1))
         ##print(sorted_dict)
         sorted_maxs = [key[0] for key in sorted_dict if key[0] in maxs]
-        # random.shuffle(sorted_maxs)
         # print("Order is "+str(sorted_maxs))
         for m in sorted_maxs:
-            # print('working on m =',m)
+            #print('working on m =',m)
             #print('Current cover list is ', [ cover.getMaxs() for cover in maxCover])
             found = False
             nextMax = self.getDownset(m)
@@ -791,10 +792,55 @@ class FiniteSpace:
                testUnion = maxCover[c].union(nextMax)
                #if (testUnion.isContractibleComponents() or nextMax.hasEmptyIntersection(maxCover[c])):
                if (testUnion.isContractibleComponents()):
+                   #print(m + " union "+str(maxCover[c].getMaxs()) + " is contractible.")
                    maxCover[c] = testUnion
                    found = True
                    break
             if found==False:
+                #print(m + " union "+str(maxCover[c].getMaxs()) + " is NOT contractible.")
+                maxCover.append(nextMax)
+            #print('Current cover list is ', [ cover.getMaxs() for cover in maxCover])
+        return maxCover
+    
+    
+    def shuffleCatCover(self):
+        '''
+        Approximates the geometric category of a finite space
+
+        Returns
+        -------
+        maxCover : list
+            Returns a list of finite spaces whose union covers self.
+
+        '''
+        maxCover = []
+        maxs = self.getMaxs()
+        m = maxs.pop()
+        #print("Starting max is "+str(m))
+        maxCover.append(self.getDownset(m))
+        dist_dict = nx.shortest_path_length(self.adjacencies, m)
+        ##for k in dist_dict:
+            ##print(str(k)+" "+str(dist_dict.get(k)))
+        sorted_dict = sorted(dist_dict.items(), key=operator.itemgetter(1))
+        ##print(sorted_dict)
+        sorted_maxs = [key[0] for key in sorted_dict if key[0] in maxs]
+        random.shuffle(sorted_maxs)
+        # print("Order is "+str(sorted_maxs))
+        for m in sorted_maxs:
+            #print('working on m =',m)
+            #print('Current cover list is ', [ cover.getMaxs() for cover in maxCover])
+            found = False
+            nextMax = self.getDownset(m)
+            for c in range(len(maxCover)):
+               testUnion = maxCover[c].union(nextMax)
+               #if (testUnion.isContractibleComponents() or nextMax.hasEmptyIntersection(maxCover[c])):
+               if (testUnion.isContractibleComponents()):
+                   #print(m + " union "+str(maxCover[c].getMaxs()) + " is contractible.")
+                   maxCover[c] = testUnion
+                   found = True
+                   break
+            if found==False:
+                #print(m + " union "+str(maxCover[c].getMaxs()) + " is NOT contractible.")
                 maxCover.append(nextMax)
             #print('Current cover list is ', [ cover.getMaxs() for cover in maxCover])
         return maxCover
