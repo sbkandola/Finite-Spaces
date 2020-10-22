@@ -8,7 +8,7 @@ Created on Sun Mar 15 09:37:38 2020
 # Class for brute-force calculating the geometric category of a finite space
 
 import FiniteSpace_Examples as FE
-
+import more_itertools as mit
 
 def partition(maxs):
     '''
@@ -31,10 +31,10 @@ def partition(maxs):
         for n, subset in enumerate(smaller):
             yield smaller[:n] + [[ first ] + subset]  + smaller[n+1:]
         yield [ [ first ] ] + smaller
-        
+
 def is_gcat_cover(space, part):
     '''
-    
+
 
     Parameters
     ----------
@@ -55,7 +55,7 @@ def is_gcat_cover(space, part):
 
 def get_brute_gcat(space):
     '''
-    
+
 
     Parameters
     ----------
@@ -72,15 +72,15 @@ def get_brute_gcat(space):
         if (len(part)<gc and is_gcat_cover(space,part)):
             gc = len(part)
     return gc
-    
-            
-    
+
+
+
 if __name__=='__main__':
-    
+
     K = FE.Build_Klein()
     S = FE.Build_MinCircle()
-    
-    
+
+
     for part in partition(list(S.getMaxs())):
         print(is_gcat_cover(S,part))
         print(len(part))
