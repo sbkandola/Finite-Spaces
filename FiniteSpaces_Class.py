@@ -124,7 +124,7 @@ class FiniteSpace:
         True if p1 >= p2.
 
         '''
-        return (p2 in self.Hasse.successors(p1))
+        return (p2 in self.Hasse.successors(p1) or p1==p2)
 
     def isleq(self,p1,p2):
         '''
@@ -143,7 +143,7 @@ class FiniteSpace:
             True if p1 <= p2.
 
         '''
-        return (p1 in self.Hasse.successors(p2))
+        return (p1 in self.Hasse.successors(p2) or p1==p2)
 
     def product(self, space2):
         '''
@@ -611,6 +611,17 @@ class FiniteSpace:
 
 
     def getRetract(self):
+        '''
+        
+
+        Returns
+        -------
+        deformation : LIST
+            A list of ordered pairs of points (p,q) of self
+            where p is a beat point and q is the image of p
+            under a deformation retract.
+
+        '''
         deformation = list()
         core = self
         (y,p,q) = core.hasGetBeatRetract()
@@ -631,6 +642,22 @@ class FiniteSpace:
                     
     
     def getCatPath(self,a):
+        '''
+        
+
+        Parameters
+        ----------
+        a : String
+            The name of a point in self.
+
+        Returns
+        -------
+        path_space : FiniteSpace
+            If self is contractible, this returns a zigzag
+            whose endpoints are 'a' and the core of self
+            as a FiniteSpace.
+
+        '''
         if len(self.getCore())!=1:
             print("Space is not contractible.")
             return
@@ -643,7 +670,7 @@ class FiniteSpace:
                 last = path[len(path)-1]
                 next_point = [pair[1] for pair in deformation if pair[0]==last][0]
                 path.append(next_point)
-            
+            print(path)
             path_space = FiniteSpace(self.Hasse.subgraph(set(path)))
             (y,p) = path_space.hasGet2Chain()
             while y:
@@ -653,6 +680,64 @@ class FiniteSpace:
                 
             return path_space
         
+        
+    def getMotionPlanner(self,ab_cover,a,b):
+        '''
+        
+
+        Parameters
+        ----------
+        cover : FiniteSpace
+            A categorical subset of self^2 containing 
+            the point (a,b).
+        a : String
+            The name of a start point in self.
+        b : String
+            The name of an end point in self.
+
+        Returns
+        -------
+        None.
+
+        '''
+        ab = str(a+','+b)
+        if ab not in ab_cover.points:
+            print(str(ab)+str(" is not in space."))
+            
+        print("Core is "+str(ab_cover.getCore().points))
+        
+        deformation = ab_cover.getRetract()
+        core = deformation[len(deformation)-1][1]
+        core_a = core.rsplit(',',1)[0]
+        core_b = core.rsplit(',',1)[1]
+        path = list()
+        path.append(ab)
+        
+            
+        for pair in deformation:
+            last = path[len(path)-1]
+            if pair[0]==last:
+                path.append(pair[1])
+            else:
+                path.append(last)
+        
+        print(path)
+            
+        ab_path = list()
+        
+        # Follow the path to the core
+        for i in range(len(path)):
+            ab_path.append(path[i].rsplit(',',1)[0])
+        
+        # Path between two points of core
+        core_path = self.getPath(core_a,core_b)
+        ab_path = ab_path + core_path[1:len(core_path)-1]
+        
+        # Path from core to end?
+        # TODO This is where I'm at! Is the indexing right?!??
+        for i in range(len(path)):
+            ab_path.append(path[len(path)-i-1].rsplit(',',1)[1])
+        return(ab_path)
         
         
     
@@ -748,18 +833,6 @@ class FiniteSpace:
         maxs = set(n for n in self.Hasse.nodes if self.Hasse.in_degree(n)==0)
         return maxs
 
-    # Greedy algorithm builds the largest contratctible subset
-    # # of a space that it can by randomly adding other downsets
-    # Probably don't need this anymore
-    # def buildMaxContractible(self):
-    #     maxs = self.getMaxs()
-    #     candidate = self.getDownset(maxs.pop())
-    #     while len(maxs)>0:
-    #         nextSet = self.getDownset(maxs.pop())
-    #         nextNextSet = candidate.union(nextSet)
-    #         if nextNextSet.isContractible():
-    #             candidate = candidate.union(nextNextSet)
-    #     return candidate
 
     def getCatCover(self):
         '''
@@ -774,32 +847,21 @@ class FiniteSpace:
         maxCover = []
         maxs = self.getMaxs()
         m = maxs.pop()
-        #print("Starting max is "+str(m))
         maxCover.append(self.getDownset(m))
         dist_dict = nx.shortest_path_length(self.adjacencies, m)
-        ##for k in dist_dict:
-            ##print(str(k)+" "+str(dist_dict.get(k)))
         sorted_dict = sorted(dist_dict.items(), key=operator.itemgetter(1))
-        ##print(sorted_dict)
         sorted_maxs = [key[0] for key in sorted_dict if key[0] in maxs]
-        # print("Order is "+str(sorted_maxs))
         for m in sorted_maxs:
-            #print('working on m =',m)
-            #print('Current cover list is ', [ cover.getMaxs() for cover in maxCover])
             found = False
             nextMax = self.getDownset(m)
             for c in range(len(maxCover)):
                testUnion = maxCover[c].union(nextMax)
-               #if (testUnion.isContractibleComponents() or nextMax.hasEmptyIntersection(maxCover[c])):
                if (testUnion.isContractibleComponents()):
-                   #print(m + " union "+str(maxCover[c].getMaxs()) + " is contractible.")
                    maxCover[c] = testUnion
                    found = True
                    break
             if found==False:
-                #print(m + " union "+str(maxCover[c].getMaxs()) + " is NOT contractible.")
                 maxCover.append(nextMax)
-            #print('Current cover list is ', [ cover.getMaxs() for cover in maxCover])
         return maxCover
     
     
