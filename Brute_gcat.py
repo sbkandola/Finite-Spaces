@@ -8,9 +8,11 @@ Created on Sun Mar 15 09:37:38 2020
 # Class for brute-force calculating the geometric category of a finite space
 
 import FiniteSpace_Examples as FE
-import more_itertools as mit
+# import more_itertools as mit
+from itertools import combinations
 
-def partition(maxs):
+
+def partition(items, k):
     '''
 
     Parameters
@@ -19,18 +21,23 @@ def partition(maxs):
 
     Yields
     ------
-    A generator of all possible partitionings of those elements.
+    An iterator of all possible partitionings of size $k$ of those elements.
 
     '''
-    if len(maxs) == 1:
-        yield [maxs]
+    if len(items) == 1:
+        yield [items]
         return
 
-    first = maxs[0]
-    for smaller in partition(maxs[1:]):
-        for n, subset in enumerate(smaller):
-            yield smaller[:n] + [[ first ] + subset]  + smaller[n+1:]
-        yield [ [ first ] ] + smaller
+    # From https://stackoverflow.com/questions/23596702/iterating-over-partitions-in-python
+    def split(indices):
+        i=0
+        for j in indices:
+            yield items[i:j]
+            i = j
+        yield items[i:]
+
+    for indices in combinations(range(1, len(items)), k-1):
+        yield list(split(indices))
 
 def is_gcat_cover(space, part):
     '''
@@ -53,9 +60,11 @@ def is_gcat_cover(space, part):
             return False
     return True
 
-def get_brute_gcat(space):
-    '''
 
+
+
+def get_brute_gcat(space, verbose = False):
+    '''
 
     Parameters
     ----------
@@ -68,10 +77,24 @@ def get_brute_gcat(space):
     '''
     maxs = space.getMaxs()
     gc = len(maxs)
-    for part in partition(list(maxs)):
-        if (len(part)<gc and is_gcat_cover(space,part)):
-            gc = len(part)
-    return gc
+
+    for k in range(gc, 0, -1): # Search going down from a cover of size gc
+        if verbose:
+            print("Trying covers of size",k)
+
+        # Start checking for a partition of size $k$ that is a valid cover
+        for part in partition(list(maxs), k):
+            if is_gcat_cover(space,part):
+                # If you're in here, you have a valid cover.
+                gc = len(part)
+                if verbose:
+                    print('\tFound cover of size', gc)
+                k += 1
+                break
+            # If you didn't break, you didn't find a cover
+            if verbose:
+                print('No cover found of size', k,"so min size cover is",str(gc)+"... exiting.")
+            return gc
 
 
 
