@@ -128,7 +128,7 @@ class FiniteSpace:
 
     def isleq(self,p1,p2):
         '''
-        
+
 
         Parameters
         ----------
@@ -147,7 +147,7 @@ class FiniteSpace:
 
     def product(self, space2):
         '''
-        
+
 
         Parameters
         ----------
@@ -167,8 +167,8 @@ class FiniteSpace:
             for q in space2.points:
                 prod.append(p+','+q)
         s1xs2.add_nodes_from(prod)
-        
-        for pair in prod: 
+
+        for pair in prod:
             points = pair.rsplit(',',1)
             for p in self.getDownset(points[0]).points:
                 for q in space2.getDownset(points[1]).points:
@@ -176,13 +176,13 @@ class FiniteSpace:
                     if pair != target:
                         s1xs2.add_edge(pair,target)
         s1xs2 = nx.transitive_reduction(s1xs2)
-        
+
         return FiniteSpace(s1xs2)
-    
+
 
     def op(self):
         '''
-        
+
 
         Returns
         -------
@@ -197,7 +197,7 @@ class FiniteSpace:
 
     def copy(self):
         '''
-        
+
 
         Returns
         -------
@@ -212,7 +212,7 @@ class FiniteSpace:
 
     def union(self,space2):
         '''
-        
+
 
         Parameters
         ----------
@@ -233,7 +233,7 @@ class FiniteSpace:
 
     def intersection(self, space2):
         '''
-        
+
 
         Parameters
         ----------
@@ -251,7 +251,7 @@ class FiniteSpace:
 
     def hasEmptyIntersection(self,space2):
         '''
-        
+
 
         Parameters
         ----------
@@ -268,7 +268,7 @@ class FiniteSpace:
 
     def join(self, space2):
         '''
-        
+
 
         Parameters
         ----------
@@ -288,11 +288,11 @@ class FiniteSpace:
                 for p in self.opens:
                     join.opens[q].add(p)
         return join
-    
-    
+
+
     def randomize(self, prob, connected):
         randomSpace = nx.DiGraph()
-                
+
         for p in self.points:
             for q in self.points:
                 if (p!=q) and (random.random() < prob):
@@ -304,11 +304,11 @@ class FiniteSpace:
                         except:
                             pass
         randomSpace = nx.transitive_reduction(randomSpace)
-                        
+
         return FiniteSpace(randomSpace)
-                        
-    
-        
+
+
+
     def isOpen(self):
         '''
         Returns
@@ -328,7 +328,7 @@ class FiniteSpace:
         '''
         Returns
         -------
-        True if self is T_0 (i.e., given any two points, 
+        True if self is T_0 (i.e., given any two points,
                              there exists an open set that contains one point
                              and not the other)
         '''
@@ -337,7 +337,7 @@ class FiniteSpace:
                 if (self.opens[p]==self.opens[q])&(p!=q):
                     return False
         return True
-    
+
     def isConnected(self):
         '''
         Determines if a FiniteSpace is path-connected
@@ -348,10 +348,10 @@ class FiniteSpace:
 
         '''
         return(nx.is_weakly_connected(self.Hasse))
-    
+
     def getPath(self,a,b):
         '''
-        
+
 
         Parameters
         ----------
@@ -366,7 +366,7 @@ class FiniteSpace:
 
         '''
         return(nx.shortest_path(self.adjacencies, a, b))
-        
+
 
     def getDownset(self,point):
         '''
@@ -440,7 +440,7 @@ class FiniteSpace:
     def getUniqueMax(self):
         '''
         If a space has a unique maximal element, it returns that element
-        
+
         Returns
         -------
         A point from self.
@@ -481,7 +481,7 @@ class FiniteSpace:
 
     def beatRetract(self,point):
         '''
-        
+
 
         Parameters
         ----------
@@ -495,15 +495,15 @@ class FiniteSpace:
         '''
         upbeat = self.Hasse.in_degree(point)==1
         downbeat = self.Hasse.out_degree(point)==1
-        
+
         if downbeat:
             down = list(self.Hasse.successors(point))[0]
             return down
         elif upbeat:
             up = list(self.Hasse.predecessors(point))[0]
             return up
-        
-    
+
+
     def isBeat(self,point):
         '''
         Determines if either the punctured upset of point has a unique min,
@@ -536,7 +536,7 @@ class FiniteSpace:
 
     def getBeat(self):
         '''
-        Returns an arbitrary beat point of self                
+        Returns an arbitrary beat point of self
         Returns
         -------
         p : the name of a point in self.
@@ -550,7 +550,7 @@ class FiniteSpace:
         '''
         Determines if self has a beat point, and if so, what that beat point is
         Note: the beat point may not be unique!
-            
+
         Returns
         -------
         bool
@@ -563,12 +563,12 @@ class FiniteSpace:
             if self.isBeat(p):
                 return (True,p)
         return (False,'')
-    
+
     def hasGetBeatRetract(self):
         '''
         Determines if self has a beat point, and if so, what that beat point is
         Note: the beat point may not be unique!
-            
+
         Returns
         -------
         bool
@@ -612,7 +612,7 @@ class FiniteSpace:
 
     def getRetract(self):
         '''
-        
+
 
         Returns
         -------
@@ -630,7 +630,7 @@ class FiniteSpace:
             core = core.delBeat(p)
             (y,p,q) = core.hasGetBeatRetract()
         return deformation
-    
+
     def hasGet2Chain(self):
         for m in self.getMaxs():
             if len(self.getPuncturedDownset(m))>0:
@@ -639,11 +639,11 @@ class FiniteSpace:
                         return (True,n)
                     else:
                         return (False,'')
-                    
-    
+
+
     def getCatPath(self,a):
         '''
-        
+
 
         Parameters
         ----------
@@ -676,19 +676,19 @@ class FiniteSpace:
             while y:
                 path_space = path_space.delBeat(p)
                 (y,p) = path_space.hasGet2Chain()
-                
-                
+
+
             return path_space
-        
-        
+
+
     def getMotionPlanner(self,ab_cover,a,b):
         '''
-        
+
 
         Parameters
         ----------
         cover : FiniteSpace
-            A categorical subset of self^2 containing 
+            A categorical subset of self^2 containing
             the point (a,b).
         a : String
             The name of a start point in self.
@@ -703,44 +703,44 @@ class FiniteSpace:
         ab = str(a+','+b)
         if ab not in ab_cover.points:
             print(str(ab)+str(" is not in space."))
-            
+
         print("Core is "+str(ab_cover.getCore().points))
-        
+
         deformation = ab_cover.getRetract()
         core = deformation[len(deformation)-1][1]
         core_a = core.rsplit(',',1)[0]
         core_b = core.rsplit(',',1)[1]
         path = list()
         path.append(ab)
-        
-            
+
+
         for pair in deformation:
             last = path[len(path)-1]
             if pair[0]==last:
                 path.append(pair[1])
             else:
                 path.append(last)
-        
+
         print(path)
-            
+
         ab_path = list()
-        
+
         # Follow the path to the core
         for i in range(len(path)):
             ab_path.append(path[i].rsplit(',',1)[0])
-        
+
         # Path between two points of core
         core_path = self.getPath(core_a,core_b)
         ab_path = ab_path + core_path[1:len(core_path)-1]
-        
+
         # Path from core to end?
         # TODO This is where I'm at! Is the indexing right?!??
         for i in range(len(path)):
             ab_path.append(path[len(path)-i-1].rsplit(',',1)[1])
         return(ab_path)
-        
-        
-    
+
+
+
     def getCore(self):
         '''
         Returns
@@ -794,7 +794,7 @@ class FiniteSpace:
 
     def twoDownContractible(self, max1, max2):
         '''
-        
+
 
         Parameters
         ----------
@@ -863,11 +863,21 @@ class FiniteSpace:
             if found==False:
                 maxCover.append(nextMax)
         return maxCover
-    
-    
-    def shuffleCatCover(self):
+
+
+    def shuffleCatCover(self, randomizeStart = True, randomizeStyle = "BFS", verbose = False):
         '''
         Approximates the geometric category of a finite space
+
+        randomizeStart: boolean
+            If true, the starting cover element is chosen randomly
+            If False, it is the first element popped from the max list
+            Note that if randomizeStyle is "Random", then this has no effect.
+
+        randomizeStyle: string
+            If "Random", then it shuffles all maximal elements without regards to distance
+            If "BFS", then it sorts the elements in BFS order,
+            If "BFS-random", also shuffles within the elements of the same distance.
 
         Returns
         -------
@@ -876,18 +886,59 @@ class FiniteSpace:
 
         '''
         maxCover = []
-        maxs = self.getMaxs()
-        m = maxs.pop()
-        #print("Starting max is "+str(m))
-        maxCover.append(self.getDownset(m))
-        dist_dict = nx.shortest_path_length(self.adjacencies, m)
-        ##for k in dist_dict:
-            ##print(str(k)+" "+str(dist_dict.get(k)))
-        sorted_dict = sorted(dist_dict.items(), key=operator.itemgetter(1))
-        ##print(sorted_dict)
-        sorted_maxs = [key[0] for key in sorted_dict if key[0] in maxs]
-        random.shuffle(sorted_maxs)
-        # print("Order is "+str(sorted_maxs))
+        maxs = list(self.getMaxs())
+
+
+        if "BFS" in randomizeStyle.upper():
+            # Find the BFS ordering from a starting element,
+            if randomizeStart:
+                index = np.random.randint(len(maxs))
+            else:
+                index = 0
+            m = maxs.pop(index)
+            maxCover.append(self.getDownset(m))
+
+            if verbose:
+                print("Using BFS")
+                print("Starting max is "+str(m))
+
+            # Sort the elements based on distance to the initial max element
+            dist_dict = nx.shortest_path_length(self.adjacencies, m)
+            dict_by_distance = {}
+            for u in maxs:
+                dist = dist_dict[u]
+                if dist in dict_by_distance.keys():
+                    dict_by_distance[dist].append(u)
+                else:
+                    dict_by_distance[dist] = [u]
+
+            dists = list(dict_by_distance.keys())
+            dists.sort()
+
+            # Shuffle each distance list if randomizeStyle is "BFS-Random"
+            if "RANDOM" in randomizeStyle.upper():
+                if verbose:
+                    print("Using random BFS")
+                for key in dict_by_distance.keys():
+                    np.random.shuffle(dict_by_distance[key])
+
+
+            sorted_maxs = np.concatenate([dict_by_distance[i] for i in dists])
+
+            if verbose:
+                print(sorted_maxs)
+
+        if randomizeStyle.upper() == "RANDOM":
+            # Randomize by just randomizing the list of maximal elements
+
+            sorted_maxs = maxs
+            np.random.shuffle(sorted_maxs)
+
+            # Initialize the cover with a single element
+            m = sorted_maxs.pop(index)
+            maxCover.append(self.getDownset(m))
+
+
         for m in sorted_maxs:
             #print('working on m =',m)
             #print('Current cover list is ', [ cover.getMaxs() for cover in maxCover])
