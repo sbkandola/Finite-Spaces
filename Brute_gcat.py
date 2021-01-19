@@ -14,30 +14,104 @@ from itertools import combinations
 
 def partition(items, k):
     '''
+    Code from:
+    https://codereview.stackexchange.com/questions/1526/finding-all-k-subset-partitions
+
+    Uses Algorithm U, described by Knuth in the Art of Computer Programming, Volume 4,
+    Fascicle 3B.
 
     Parameters
     ----------
-    maxs : a list of elements.
+    items : a list of elements
+    k : an integer, the number of sets in the partition
 
     Yields
     ------
-    An iterator of all possible partitionings of size $k$ of those elements.
+    An iterator of all possible partitionings of size $k$ of the elements.
 
     '''
-    if len(items) == 1:
-        yield [items]
-        return
+    m = k
 
-    # From https://stackoverflow.com/questions/23596702/iterating-over-partitions-in-python
-    def split(indices):
-        i=0
-        for j in indices:
-            yield items[i:j]
-            i = j
-        yield items[i:]
+    def visit(n, a):
+        ps = [[] for i in range(m)]
+        for j in range(n):
+            ps[a[j + 1]].append(items[j])
+        return ps
 
-    for indices in combinations(range(1, len(items)), k-1):
-        yield list(split(indices))
+    def f(mu, nu, sigma, n, a):
+        if mu == 2:
+            yield visit(n, a)
+        else:
+            for v in f(mu - 1, nu - 1, (mu + sigma) % 2, n, a):
+                yield v
+        if nu == mu + 1:
+            a[mu] = mu - 1
+            yield visit(n, a)
+            while a[nu] > 0:
+                a[nu] = a[nu] - 1
+                yield visit(n, a)
+        elif nu > mu + 1:
+            if (mu + sigma) % 2 == 1:
+                a[nu - 1] = mu - 1
+            else:
+                a[mu] = mu - 1
+            if (a[nu] + sigma) % 2 == 1:
+                for v in b(mu, nu - 1, 0, n, a):
+                    yield v
+            else:
+                for v in f(mu, nu - 1, 0, n, a):
+                    yield v
+            while a[nu] > 0:
+                a[nu] = a[nu] - 1
+                if (a[nu] + sigma) % 2 == 1:
+                    for v in b(mu, nu - 1, 0, n, a):
+                        yield v
+                else:
+                    for v in f(mu, nu - 1, 0, n, a):
+                        yield v
+
+    def b(mu, nu, sigma, n, a):
+        if nu == mu + 1:
+            while a[nu] < mu - 1:
+                yield visit(n, a)
+                a[nu] = a[nu] + 1
+            yield visit(n, a)
+            a[mu] = 0
+        elif nu > mu + 1:
+            if (a[nu] + sigma) % 2 == 1:
+                for v in f(mu, nu - 1, 0, n, a):
+                    yield v
+            else:
+                for v in b(mu, nu - 1, 0, n, a):
+                    yield v
+            while a[nu] < mu - 1:
+                a[nu] = a[nu] + 1
+                if (a[nu] + sigma) % 2 == 1:
+                    for v in f(mu, nu - 1, 0, n, a):
+                        yield v
+                else:
+                    for v in b(mu, nu - 1, 0, n, a):
+                        yield v
+            if (mu + sigma) % 2 == 1:
+                a[nu - 1] = 0
+            else:
+                a[mu] = 0
+        if mu == 2:
+            yield visit(n, a)
+        else:
+            for v in b(mu - 1, nu - 1, (mu + sigma) % 2, n, a):
+                yield v
+
+    n = len(items)
+    a = [0] * (n + 1)
+    for j in range(1, m + 1):
+        a[n - m + j] = j - 1
+    return f(m, n, 0, n, a)
+
+
+
+
+
 
 def is_gcat_cover(space, part):
     '''
@@ -78,7 +152,7 @@ def get_brute_gcat(space, verbose = False):
     maxs = space.getMaxs()
     gc = len(maxs)
 
-    for k in range(gc, 0, -1): # Search going down from a cover of size gc
+    for k in range(gc, 1, -1): # Search going down from a cover of size gc down to 2
         if verbose:
             print("Trying covers of size",k)
 
@@ -92,9 +166,14 @@ def get_brute_gcat(space, verbose = False):
                 k += 1
                 break
             # If you didn't break, you didn't find a cover
-            if verbose:
-                print('No cover found of size', k,"so min size cover is",str(gc)+"... exiting.")
-            return gc
+
+    # Test the space itself
+    if is_gcat_cover(space,[maxs]):
+        gc = 1
+        if verbose:
+            print('\tFound cover of size', gc)
+
+    return gc
 
 
 
