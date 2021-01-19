@@ -151,29 +151,45 @@ def get_brute_gcat(space, verbose = False):
     '''
     maxs = space.getMaxs()
     gc = len(maxs)
+    
+    keepLooking = True
+    k = gc
 
-    for k in range(gc, 1, -1): # Search going down from a cover of size gc down to 2
-        if verbose:
-            print("Trying covers of size",k)
-
+    while keepLooking and k >= 2: 
+        print('k=',k)
         # Start checking for a partition of size $k$ that is a valid cover
-        for part in partition(list(maxs), k):
-            if is_gcat_cover(space,part):
-                # If you're in here, you have a valid cover.
-                gc = len(part)
-                if verbose:
-                    print('\tFound cover of size', gc)
-                break
-            # If you didn't break, you didn't find a cover
+        if k>=2:
+            for part in partition(list(maxs), k):
+                # print(part)
+                if is_gcat_cover(space, part):
+                    # If you're in here, you have a valid cover.
+                    print(part)
+                    gc = len(part)
+                    k -=1 
+                    if verbose:
+                        print('\tFound cover of size', gc)
+                        print('and k = '+str(k))
+                    break  
+                
+        # If you didn't break, you didn't find a cover
+        if gc != k+1:
+            keepLooking = False
             print('\tNo cover found of size', len(part),'... exiting.')
             return gc
-
-    # Test the space itself
-    if is_gcat_cover(space,[maxs]):
-        gc = 1
-        if verbose:
+        
+        
+    if gc == 2:
+        # If you got down to 2, test 1
+        print('k = 1')
+        part = [maxs]
+        if [1] in part:
+            print(part)
+            gc = len(part)
             print('\tFound cover of size', gc)
-
+        else:
+            print('\tNo cover found of size', len(part),'... exiting.')
+            return gc
+        
     return gc
 
 
