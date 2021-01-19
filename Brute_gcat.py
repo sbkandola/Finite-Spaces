@@ -163,7 +163,6 @@ def get_brute_gcat(space, verbose = False):
                 gc = len(part)
                 if verbose:
                     print('\tFound cover of size', gc)
-                k += 1
                 break
             # If you didn't break, you didn't find a cover
             print('\tNo cover found of size', len(part),'... exiting.')
