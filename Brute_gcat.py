@@ -156,7 +156,7 @@ def get_brute_gcat(space, verbose = False):
     k = gc
 
     while keepLooking and k >= 2: 
-        print('k=',k)
+        print('k = ',k)
         # Start checking for a partition of size $k$ that is a valid cover
         if k>=2:
             for part in partition(list(maxs), k):
@@ -169,7 +169,9 @@ def get_brute_gcat(space, verbose = False):
                     if verbose:
                         print('\tFound cover of size', gc)
                         print('and k = '+str(k))
-                    break  
+                    break
+            # Need to do something here 
+                    
                 
         # If you didn't break, you didn't find a cover
         if gc != k+1:
