@@ -970,7 +970,7 @@ class FiniteSpace:
 
 
     # Estimates the gcat of a space
-    def gcat(self):
+    def LScat(self):
         return len(self.getCatCover())
 
     # gets the height of a point in a Hasse diagram
@@ -978,6 +978,13 @@ class FiniteSpace:
         if len(self.Hasse)==0:
             self.getHasse()
         return len(nx.dag_longest_path(nx.dfs_tree(self.Hasse,point)))-1
+    
+    # gets the dimension of the space
+    def getDim(self):
+        dim = 0
+        for m in self.getMaxs():
+            dim = max(dim, self.getHeight(m))
+        return dim
 
     # gets the level of every point in a space
     def getLevels(self):

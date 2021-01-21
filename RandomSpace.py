@@ -26,6 +26,7 @@ def randomSpace(points, probability):
     space.add_nodes_from(range(v))
     
     # establish the height dictionary
+    # all lone points are of height 0
     height_dict = {}
     for i in range(v):
         height_dict[i] = 0
@@ -35,7 +36,8 @@ def randomSpace(points, probability):
            if (height_dict[point2]==0 or height_dict[point1] > height_dict[point2]) and (point1 != point2):
                if random.random()<p:
                    space.add_edge(point1, point2)
-                   height_dict[point1] = height_dict[point2] + 1
+                   # Sometimes, the height might not increase! Need to fix the line below.
+                   height_dict[point1] = max(height_dict[point1], height_dict[point2]+1)
                    
     space = nx.transitive_reduction(space)
     Space = FS.FiniteSpace(space)

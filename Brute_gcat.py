@@ -155,42 +155,46 @@ def get_brute_gcat(space, verbose = False):
     keepLooking = True
     k = gc
 
-    while keepLooking and k >= 2: 
-        print('k = ',k)
+    while keepLooking: 
+        print('k = ',k, 'and gc=',gc)
         # Start checking for a partition of size $k$ that is a valid cover
         if k>=2:
+            
+            
+            
             for part in partition(list(maxs), k):
                 # print(part)
                 if is_gcat_cover(space, part):
                     # If you're in here, you have a valid cover.
                     print(part)
-                    gc = len(part)
-                    k -=1 
+                    gc = k
+                    k -= 1
                     if verbose:
                         print('\tFound cover of size', gc)
-                        print('and k = '+str(k))
+                        print('and k =',k)
                     break
-            # Need to do something here 
-                    
                 
-        # If you didn't break, you didn't find a cover
-        if gc != k+1:
-            keepLooking = False
-            print('\tNo cover found of size', len(part),'... exiting.')
-            return gc
+            # We weren't able to improve the bound
+            if gc == k:
+                keepLooking = False
+                
+            # Escape the infinite loop!
+            if k==2:
+                k-=1
+            
         
         
-    if gc == 2:
-        # If you got down to 2, test 1
-        print('k = 1')
-        part = [maxs]
-        if [1] in part:
-            print(part)
-            gc = len(part)
-            print('\tFound cover of size', gc)
-        else:
-            print('\tNo cover found of size', len(part),'... exiting.')
-            return gc
+        if k == 1:
+            # If you got down to 2, test 1
+            print('k = 1')
+            part = [maxs]
+            if is_gcat_cover(space, part):
+                print(part)
+                gc = len(part)
+                print('\tFound cover of size', gc)
+            else:
+                print('\tNo cover found of size', len(part),'... exiting.')
+                return gc
         
     return gc
 
