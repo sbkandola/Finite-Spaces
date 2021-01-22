@@ -179,7 +179,7 @@ def get_brute_gcat(space, verbose = False):
                 keepLooking = False
                 
             # Escape the infinite loop!
-            if k==2:
+            if k==2 and gc==2:
                 k-=1
             
         
