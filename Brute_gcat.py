@@ -155,35 +155,38 @@ def get_brute_gcat(space, verbose = False):
     keepLooking = True
     k = gc
 
+
     while keepLooking: 
-        print('k = ',k, 'and gc=',gc)
+        # print('k = ',k, 'and gc=',gc)
         # Start checking for a partition of size $k$ that is a valid cover
-        if k>=2:
-            
-            
-            
+        
+        
+        
+        for k in range(gc,1,-1):
+            if k < gc - 1:
+                if verbose:
+                    print('k has decreased twice to',k,' without improving gc, which is',gc,'... exiting')
+                keepLooking = False
+                break
+            if verbose:
+                print('Checking partitions of size',k, 'while gc =',gc)
             for part in partition(list(maxs), k):
-                # print(part)
                 if is_gcat_cover(space, part):
                     # If you're in here, you have a valid cover.
                     print(part)
                     gc = k
-                    k -= 1
                     if verbose:
-                        print('\tFound cover of size', gc)
-                        print('and k =',k)
+                        print('\tFound cover of size', k)
                     break
-                
-            # We weren't able to improve the bound
-            if gc == k:
-                keepLooking = False
-                
-            # Escape the infinite loop!
-            if k==2 and gc==2:
+        
+        
+            if k==2:
+                if verbose:
+                    print('Manually going from 2 to 1')
                 k-=1
+                # I realize this is goofy, but it doesn't add too much extra time
+        
             
-        
-        
         if k == 1:
             # If you got down to 2, test 1
             print('k = 1')
