@@ -10,7 +10,18 @@ Created on Wed Feb  5 10:33:45 2020
 import FiniteSpaces_Class as FS
 import networkx as nx
 
+
+
 def Build_Test_SC():
+    '''
+    
+
+    Returns
+    -------
+    SC : FiniteSpace
+        A space that has different LS category and geometric category.
+
+    '''
     SC = FS.FiniteSpace(dict({
         'abc': set({'abc','ab','ac','bc'}),
         'ab': set({'ab','a','b'}),
@@ -53,6 +64,15 @@ def Build_Klein():
     return Klein
 
 def Build_NotCont():
+    '''
+    
+
+    Returns
+    -------
+    NotCont : FiniteSpace
+        A finite space that isn't contractible.
+
+    '''
     NotCont = FS.FiniteSpace(dict({
         'x1': set({'x1','y1','y2','z1','z2'}),
         'x2': set({'x2','y1','y2','y3','z1','z2'}),
@@ -87,13 +107,13 @@ def Build_MinCircle():
            'd': set({'d'})}))
     return MinCircle
 
-def Build_SixCircle():
+def Build_S1_3():
     '''
     
 
     Returns
     -------
-    SixCircle : A 6-point model of S^1 as an object from FiniteSpaces_Class.
+    SixCircle : A finite model of S1 with 3 maximal elements.
 
     '''
 
@@ -107,13 +127,13 @@ def Build_SixCircle():
         }))
     return SixCircle
 
-def Build_EightCircle():
+def Build_S1_4():
     '''
     
 
     Returns
     -------
-    SixCircle : A 6-point model of S^1 as an object from FiniteSpaces_Class.
+    SixCircle : A finite model of S1 with 4 maximal elements.
 
     '''
 
@@ -129,13 +149,13 @@ def Build_EightCircle():
         }))
     return SixCircle
 
-def Build_TenCircle():
+def Build_S1_5():
     '''
     
 
     Returns
     -------
-    TenCircle : A 10-point model of S^1 as an object from FiniteSpaces_Class.
+    TenCircle : A finite model of a circle with 5 maximal elements.
 
     '''
     TenCircle = FS.FiniteSpace(dict({
@@ -166,31 +186,29 @@ def Build_MinTorus():
     MinTorus = MinCircle.product(MinCircle)
     return MinTorus
 
-def Build_SixTorus():
+def Build_T2_9():
     '''
     
 
     Returns
     -------
-    SixTorus : A 36-point model of a Torus
-        as an object from FiniteSpaces_Class.
+    SixTorus : A finite model of the torus with 9 maximal elements.
 
     '''
-    SixCircle = Build_SixCircle()
+    SixCircle = Build_S1_3()
     SixTorus = SixCircle.product(SixCircle)
     return SixTorus
 
-def Build_TenTorus():
+def Build_T2_25():
     '''
     
 
     Returns
     -------
-    TenTorus : A 100-point model of a Torus
-        as an object from FiniteSpaces_Class.
+    TenTorus : A model of T2 with 25 maximal elements.
 
     '''
-    TenCircle = Build_TenCircle()
+    TenCircle = Build_S1_5()
     TenTorus = TenCircle.product(TenCircle)
     return TenTorus
 
@@ -230,7 +248,7 @@ def Build_Int3():
 
     Returns
     -------
-    MinCircle : The minimal finite model of S^1 
+    Int3 : A 3-point model of [0,1]
         as an object of FiniteSpaces_Class.
 
     '''
