@@ -935,6 +935,7 @@ class FiniteSpace:
             np.random.shuffle(sorted_maxs)
 
             # Initialize the cover with a single element
+            index = np.random.randint(len(maxs))
             m = sorted_maxs.pop(index)
             maxCover.append(self.getDownset(m))
 
@@ -978,7 +979,7 @@ class FiniteSpace:
         if len(self.Hasse)==0:
             self.getHasse()
         return len(nx.dag_longest_path(nx.dfs_tree(self.Hasse,point)))-1
-    
+
     # gets the dimension of the space
     def getDim(self):
         dim = 0
