@@ -3,6 +3,7 @@ The purpose of this repository is to create a program for modeling finite topolo
 
 ## Description of each file:
 
+
 ### FiniteSpaces_Class.py
 This is the most important file. It includes a variety of methods for modeling finite topological spaces. The method FiniteSpace() can be fed a dictionary of open sets, or a directed graph representing the space's Hasse diagram. You can visualize the space using the drawHasse() method.
 The class also includes methods for taking topological combinations of spaces: union, intersection, product, etc.
