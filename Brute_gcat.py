@@ -137,7 +137,7 @@ def is_gcat_cover(space, part):
 
 
 
-def get_brute_gcat(space, verbose = False):
+def get_brute_gcat(space, verbose = False, upper = None):
     '''
 
     Parameters
@@ -150,10 +150,13 @@ def get_brute_gcat(space, verbose = False):
 
     '''
     maxs = space.getMaxs()
-    gc = len(maxs)
+    
     
     keepLooking = True
-    k = gc
+    if not upper:
+        gc = len(maxs)
+    else:
+        gc = upper
 
 
     while keepLooking: 
@@ -200,7 +203,6 @@ def get_brute_gcat(space, verbose = False):
                 return gc
         
     return gc
-
 
 
 if __name__=='__main__':
