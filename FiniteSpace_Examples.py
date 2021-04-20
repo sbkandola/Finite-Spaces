@@ -199,6 +199,17 @@ def Build_T2_9():
     SixTorus = SixCircle.product(SixCircle)
     return SixTorus
 
+def Build_T2_16():
+    '''
+    
+
+    Returns
+    -------
+    SixTorus : A finite model of the torus with 16 maximal elements.
+
+    '''
+    return Build_S1_4().product(Build_S1_4())
+
 def Build_T2_25():
     '''
     
