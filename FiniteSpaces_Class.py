@@ -741,7 +741,7 @@ class FiniteSpace:
 
 
 
-    def getCore(self):
+    def getCore_old(self):
         '''
         Returns
         -------
@@ -757,6 +757,73 @@ class FiniteSpace:
             (y,p) = core.hasGetBeat()
             #print(p)
         return core
+    
+    def getVertexLists(self,G):
+        L_in = []
+        L_out = []
+        for v in G.nodes():
+            indeg = G.in_degree(v)
+            outdeg = G.out_degree(v)
+            if indeg>0: # Don't add maximal elements
+                L_in.append(  (indeg, v)  )
+            if outdeg>0: # Don't add minimal elements
+                L_out.append( (outdeg, v))
+        L_in.sort()
+        L_out.sort()
+        
+        return L_in,L_out
+    
+    def getCore(self):
+        G = nx.DiGraph(self.Hasse)
+        L_in,L_out = self.getVertexLists(G)
+        while (len(L_in)>0 and L_in[0][0] ==1) or (len(L_out)>0 and L_out[0][0] ==1):
+            # if a vertex has in-degree 1
+            if L_in[0][0] ==1:
+                # get that vertex
+                First = L_in.pop(0)
+                p = First[1]
+                
+                # Get the only upper neighbor
+                w = next(G.predecessors(p))
+                # Get all the lower neighbors
+                U = [u for u in G.successors(p)]
+                
+                # Remove that vertex
+                G.remove_node(p)
+                
+                # Add all the edges that would've been deleted
+                edges = [(w,u) for u in U]
+                G.add_edges_from(edges)
+                
+                # Remove excess edges
+                G = nx.transitive_reduction(G)
+                
+                # Recreate the vertex lists
+                L_in,L_out = self.getVertexLists(G)
+                
+                
+                
+                
+            elif L_out[0][0] ==1:
+                First = L_out.pop(0)
+                p = First[1]
+                
+                # Get the only lower neighbor
+                w = next(G.successors(p))
+                # Get all the upper neighbors
+                U = [u for u in G.predecessors(p)]
+                
+                # Remove the vertex
+                G.remove_node(p)
+                
+                # Replace the edges
+                edges = [(u,w) for u in U]
+                G.add_edges_from(edges)
+                G = nx.transitive_reduction(G)
+                
+                L_in,L_out = self.getVertexLists(G)
+                
+        return(FiniteSpace(G))
 
     def isContractible(self):
         '''
