@@ -163,7 +163,8 @@ def get_brute_gcat(space, verbose = False, upper = None):
         # print('k = ',k, 'and gc=',gc)
         # Start checking for a partition of size $k$ that is a valid cover
         
-        
+        # Initialize k=1 in case it's contractible
+        k=1
         
         for k in range(gc,1,-1):
             if k < gc - 1:
@@ -176,9 +177,9 @@ def get_brute_gcat(space, verbose = False, upper = None):
             for part in partition(list(maxs), k):
                 if is_gcat_cover(space, part):
                     # If you're in here, you have a valid cover.
-                    print(part)
                     gc = k
                     if verbose:
+                        print(part)
                         print('\tFound cover of size', k)
                     break
         
@@ -192,15 +193,18 @@ def get_brute_gcat(space, verbose = False, upper = None):
             
         if k == 1:
             # If you got down to 2, test 1
-            print('k = 1')
+            if verbose:
+                print('Testing k = 1')
             part = [maxs]
             if is_gcat_cover(space, part):
-                print(part)
                 gc = len(part)
-                print('\tFound cover of size', gc)
+                if verbose:
+                    print(part)
+                    print('\tFound cover of size', gc)
                 return gc
             else:
-                print('\tNo cover found of size', len(part),'... exiting.')
+                if verbose:
+                    print('\tNo cover found of size', len(part),'... exiting.')
                 return gc
         
     return gc
