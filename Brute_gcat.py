@@ -198,6 +198,7 @@ def get_brute_gcat(space, verbose = False, upper = None):
                 print(part)
                 gc = len(part)
                 print('\tFound cover of size', gc)
+                return gc
             else:
                 print('\tNo cover found of size', len(part),'... exiting.')
                 return gc
