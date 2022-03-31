@@ -81,6 +81,7 @@ class FiniteSpace:
 
     def getHasse(self):
         '''
+        There is an error somewhere in here!
         Returns
         -------
         None. Populates self.Hasse with the Hasse diagram of the space.
@@ -901,7 +902,7 @@ class FiniteSpace:
         return maxs
 
 
-    def getCatCover(self):
+    def getCatCover(self, verbose=False):
         '''
         Approximates the geometric category of a finite space
 
@@ -913,8 +914,11 @@ class FiniteSpace:
         '''
         maxCover = []
         maxs = self.getMaxs()
+        if verbose:
+            print('maxs are ', maxs)
         m = maxs.pop()
         maxCover.append(self.getDownset(m))
+        # This approach doesn't work if the space isn't path-connected
         dist_dict = nx.shortest_path_length(self.adjacencies, m)
         sorted_dict = sorted(dist_dict.items(), key=operator.itemgetter(1))
         sorted_maxs = [key[0] for key in sorted_dict if key[0] in maxs]
@@ -923,6 +927,7 @@ class FiniteSpace:
             nextMax = self.getDownset(m)
             for c in range(len(maxCover)):
                testUnion = maxCover[c].union(nextMax)
+               # ToDo: we can only allow contractible components if the ambient space is path connected
                if (testUnion.isContractibleComponents()):
                    maxCover[c] = testUnion
                    found = True
@@ -993,7 +998,7 @@ class FiniteSpace:
             sorted_maxs = np.concatenate([dict_by_distance[i] for i in dists])
 
             if verbose:
-                print(sorted_maxs)
+                print("sorted maxes are",sorted_maxs)
 
         if randomizeStyle.upper() == "RANDOM":
             # Randomize by just randomizing the list of maximal elements
