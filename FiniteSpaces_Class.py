@@ -269,7 +269,7 @@ class FiniteSpace:
 
     def join(self, space2):
         '''
-
+        TODO: Update this in terms of graph theory
 
         Parameters
         ----------
@@ -288,6 +288,8 @@ class FiniteSpace:
             for q in space2.opens:
                 for p in self.opens:
                     join.opens[q].add(p)
+        else:
+            print("ERROR: Spaces must have disjoint vertex sets.")
         return join
 
 
